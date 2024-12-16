@@ -1,0 +1,90 @@
+//Class Diagram Description
+
+//Classes and Relationships
+     .Meal
+
+	Attributes:
+name: String
+ingredients: List<String>
+price: double
+	Methods:
+getName(): String
+getIngredients(): List<String>
+getPrice(): double
+
+    .Order
+
+	Attributes:
+orderID: int
+meals: List<Meal>
+totalPrice: double
+status: String (e.g., "Pending", "Delivered")
+type: String (e.g., "Dine-In", "Delivery")
+tip: double
+	Methods:
+calculateTotalPrice(): void
+updateStatus(String status): void
+
+    .Menu
+
+	Attributes:
+meals: List<Meal>
+	Methods:
+addMeal(Meal meal): void
+removeMeal(String mealName): void
+updateMeal(String mealName, Meal newMeal): void
+getMeals(): List<Meal>
+
+    .OrderManager
+
+	Attributes:
+orders: List<Order>
+	Methods:
+addOrder(Order order): void
+updateOrderStatus(int orderID, String status): void
+getOrders(): List<Order>
+
+    .CustomerNotification
+
+	Methods:
+sendNotification(String status): void
+
+   .ReportGenerator
+
+	Methods:
+generateDailyOrdersReport(): void
+generateMostPopularMealReport(): void
+generateDailyRevenueReport(): void
+generateFrequentCustomerReport(): void
+
+   .Authentication
+
+	Attributes:
+users: Map<String, String> (username, password)
+	Methods:
+login(String username, String password): boolean
+checkRole(String username): String
+
+    .PaymentProcessor
+
+	Methods:
+processPayment(double amount): boolean
+
+    .RestaurantManagementApp (Main)
+
+	Attributes:
+menu: Menu
+orderManager: OrderManager
+auth: Authentication
+	Methods:
+main(String[] args): void
+
+
+Relationships
+
+1.Order has a composition relationship with Meal.
+2.Menu has an aggregation relationship with Meal.
+3.OrderManager has an aggregation relationship with Order.
+4.RestaurantManagementApp depends on Menu, OrderManager, and Authentication.
+5.CustomerNotification is used by OrderManager.
+6.ReportGenerator accesses data from OrderManager.
