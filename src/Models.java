@@ -9,7 +9,7 @@ class OrderDetail implements Serializable {
     public long mealId;
     public long count;
     public Order order;
-    public Modls meal;
+    public Models meal;
 
     public static void addOrderDetail(List<OrderDetail> details, OrderDetail detail) {
         details.add(detail);
@@ -39,7 +39,7 @@ class MealComponent implements Serializable {
 
     public long mealId;
     public long componentId;
-    public Modls meal;
+    public Models meal;
     public Component component;
 }
 
@@ -85,22 +85,22 @@ class User {
     }
 }
 
-class Modls {
+class Models {
 
     public long id;
     public String name;
     public long quantity;
     public List<MealComponent> mealComponents; // Relationship: One Meal to Many MealComponents
 
-    public static void saveToFileBinary(List<Modls> meals, String filePath) throws IOException {
+    public static void saveToFileBinary(List<Models> meals, String filePath) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(meals);
         }
     }
 
-    public static List<Modls> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
+    public static List<Models> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<Modls>) ois.readObject();
+            return (List<Models>) ois.readObject();
         }
     }
 }
