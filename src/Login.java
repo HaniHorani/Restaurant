@@ -3,12 +3,20 @@ package src;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Login extends JFrame {
-    Font font =new Font("Cocon",Font.PLAIN,18);
-
+class Login extends JFrame implements ActionListener{
+    Font cocon =new Font("Cocon",Font.PLAIN,18);
+    JTextField userTextField;
+    JPasswordField passField;
+    String loginame ,loginpassword;
+    JButton loginButton;
+    JButton SginButton;
+    JPanel mainPanel;
     public Login() {
         this.setTitle("Login");
+        this.setIconImage(new ImageIcon("images\\Resturant-main.png").getImage());
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setSize(600,700);
 
@@ -17,7 +25,7 @@ public class Login extends JFrame {
         int screenHeight =screenSize.height;
         this.setLocation((screenWidth-this.getWidth())/2,(screenHeight-this.getHeight())/2);
 
-        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(new EmptyBorder(20,20,20,20));
 
         GridBagConstraints gbc =new GridBagConstraints();
@@ -35,15 +43,15 @@ public class Login extends JFrame {
 
 
         JLabel userLabel =new JLabel("Username:");
-        userLabel.setFont(font);
+        userLabel.setFont(cocon);
         gbc.gridx =0;
         gbc.gridy =1;
         gbc.gridwidth =1;
         gbc.anchor =GridBagConstraints.EAST;
         mainPanel.add(userLabel,gbc);
 
-        JTextField userTextField =new JTextField();
-        userTextField.setFont(font);
+        userTextField =new JTextField();
+        userTextField.setFont(cocon);
         userTextField.setPreferredSize(new Dimension(300,40));
         userTextField.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Color.BLACK,1),
@@ -53,17 +61,16 @@ public class Login extends JFrame {
         gbc.gridy =1;
         gbc.anchor =GridBagConstraints.WEST;
         mainPanel.add(userTextField,gbc);
-
-        // Password label and field
+        
         JLabel passLabel =new JLabel("Password:");
-        passLabel.setFont(font);
+        passLabel.setFont(cocon);
         gbc.gridx =0;
         gbc.gridy =2;
         gbc.anchor =GridBagConstraints.EAST;
         mainPanel.add(passLabel,gbc);
 
-        JPasswordField passField =new JPasswordField();
-        passField.setFont(font);
+        passField =new JPasswordField();
+        passField.setFont(cocon);
         passField.setPreferredSize(new Dimension(300,40));
         passField.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Color.BLACK, 1),
@@ -74,8 +81,9 @@ public class Login extends JFrame {
         gbc.anchor =GridBagConstraints.WEST;
         mainPanel.add(passField,gbc);
 
-        JButton loginButton = new JButton("Login");
-        loginButton.setFont(font);
+        loginButton = new JButton("Login");
+        loginButton.addActionListener(this);
+        loginButton.setFont(cocon);
         loginButton.setForeground(Color.WHITE);
         loginButton.setBackground(new Color(64, 123, 255));
         loginButton.setPreferredSize(new Dimension(150, 40));
@@ -83,24 +91,51 @@ public class Login extends JFrame {
         gbc.gridy =3;
         gbc.gridwidth =2;
         gbc.anchor = GridBagConstraints.CENTER;
+        loginButton.setFocusable(false);
         mainPanel.add(loginButton,gbc);
 
         gbc.gridx =0;
         gbc.gridy =4;
         gbc.gridwidth =2;
         gbc.anchor =GridBagConstraints.CENTER;
-        JButton SginButton =new JButton("sgin up");
-        SginButton.setFont(font);
+        SginButton =new JButton("sgin up");
+        SginButton.setFont(cocon);
         SginButton.setForeground(new Color(64,123,255));
         SginButton.setBackground(Color.WHITE);
         SginButton.setBorder(null);
+        SginButton.setFocusable(false);
+        SginButton.addActionListener(this);
+
         mainPanel.add(SginButton,gbc);
 
         mainPanel.setBackground(Color.white);
 
+
         this.add(mainPanel);
 
+
+        this.pack();
         this.setVisible(true);
+    }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == SginButton){
+            this.remove(mainPanel);
+            mainPanel=new Register();
+            this.repaint();
+            this.add(mainPanel);
+            this.revalidate();
+            this.setTitle("Sgin up");
+
+        }
+        else if(e.getSource() == loginButton){
+            loginame = userTextField.getText();
+            loginpassword =new String(passField.getPassword());
+
+
+
+
+        }
     }
 }
 
@@ -135,6 +170,105 @@ class Resizer extends JPanel {
             int y =(panelHeight-newHeight)/2;
 
             g.drawImage(image,x,y,newWidth,newHeight,this);
+        }
+    }
+}
+
+class Register extends JPanel implements ActionListener {
+    Font cocon =new Font("Cocon",Font.PLAIN,18);
+    JButton acceptButton;
+    String newusername;
+    String newpassword;
+    JTextField newuserTextField;
+    JTextField newpassField;
+
+    public Register() {
+         this.setLayout(new GridBagLayout());
+        this.setBorder(new EmptyBorder(20,20,20,20));
+
+        GridBagConstraints gbc =new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.fill =GridBagConstraints.HORIZONTAL;
+
+        Resizer imagePanel = new Resizer("images\\Accept request-bro.png");
+        imagePanel.setBackground(Color.white);
+        imagePanel.setPreferredSize(new Dimension(500, 300));
+        gbc.gridx =0;
+        gbc.gridy =0;
+        gbc.gridwidth =2;
+        gbc.anchor =GridBagConstraints.CENTER;
+        this.add(imagePanel, gbc);
+
+
+        JLabel userLabel =new JLabel("New Username:");
+        userLabel.setFont(cocon);
+        gbc.gridx =0;
+        gbc.gridy =1;
+        gbc.gridwidth =1;
+        gbc.anchor =GridBagConstraints.EAST;
+        this.add(userLabel,gbc);
+
+        newuserTextField =new JTextField();
+        newuserTextField.setFont(cocon);
+        newuserTextField.setPreferredSize(new Dimension(300,40));
+        newuserTextField.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(Color.BLACK,1),
+                new EmptyBorder(10,10,10,10)
+        ));
+        gbc.gridx =1;
+        gbc.gridy =1;
+        gbc.anchor =GridBagConstraints.WEST;
+        this.add(newuserTextField,gbc);
+
+        JLabel passLabel =new JLabel("New Password:");
+        passLabel.setFont(cocon);
+        gbc.gridx =0;
+        gbc.gridy =2;
+        gbc.anchor =GridBagConstraints.EAST;
+        this.add(passLabel,gbc);
+
+        newpassField = new JTextField();
+        newpassField.setFont(cocon);
+        newpassField.setPreferredSize(new Dimension(300,40));
+        newpassField.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(Color.BLACK, 1),
+                new EmptyBorder(10, 10, 10, 10)
+        ));
+        gbc.gridx =1;
+        gbc.gridy =2;
+        gbc.anchor =GridBagConstraints.WEST;
+        this.add(newpassField,gbc);
+
+        acceptButton = new JButton("accept");
+        acceptButton.setFont(cocon);
+        acceptButton.setForeground(Color.WHITE);
+        acceptButton.setBackground(new Color(64, 123, 255));
+        acceptButton.setPreferredSize(new Dimension(150, 40));
+        acceptButton.addActionListener(this);
+        gbc.gridx =0;
+        gbc.gridy =3;
+        gbc.gridwidth =2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        acceptButton.setFocusable(false);
+        this.add(acceptButton,gbc);
+
+
+        this.setBackground(Color.white);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == acceptButton ){
+            newusername = newuserTextField.getText();
+            newpassword = newpassField.getText();
+
+
+
+
+
+           JFrame temp= (JFrame)SwingUtilities.getWindowAncestor(this);
+           temp.dispose();
+            new Login();
         }
     }
 }
