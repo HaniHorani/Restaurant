@@ -3,50 +3,6 @@ import java.io.*;
 import java.time.Instant;
 import java.util.List;
 
-/* 
-enum orderStatus {
-    pending, preparing, delivered, cancelled
-}
-
-enum orderType {
-    dinein, delivery
-}
-
-
-class Order implements Serializable {
-
-    public long id;
-    public long userId;
-    public orderStatus status;
-    public orderType type;
-    public long totalPrice;
-    public long tips;
-    public Instant createdAt;
-    public User user;
-    public List<OrderDetail> orderDetails;
-
-    public static void addOrder(List<Order> orders, Order order) {
-        orders.add(order);
-    }
-
-    public static void deleteOrder(List<Order> orders, long orderId) {
-        orders.removeIf(o -> o.id == orderId);
-    }
-
-    public static void updateOrder(List<Order> orders, Order updatedOrder) {
-        for (int i = 0; i < orders.size(); i++) {
-            if (orders.get(i).id == updatedOrder.id) {
-                orders.set(i, updatedOrder);
-                break;
-            }
-        }
-    }
-
-    public static Order getOrderById(List<Order> orders, long orderId) {
-        return orders.stream().filter(o -> o.id == orderId).findFirst().orElse(null);
-    }
-}
- */
 class OrderDetail implements Serializable {
 
     public long orderId;
@@ -87,6 +43,97 @@ class MealComponent implements Serializable {
     public Component component;
 }
 
+class Notification implements Serializable {
+
+    public long id;
+    public String title;
+    public String message;
+    public User user;
+
+    public static void addNotification(List<Notification> notifications, Notification notification) {
+        notifications.add(notification);
+    }
+
+    public static void deleteNotification(List<Notification> notifications, long notificationId) {
+        notifications.removeIf(n -> n.id == notificationId);
+    }
+}
+
+class User {
+
+    public enum UserType {
+        ADMIN, CUSTOMER, MANAGER, EMPLOYEE
+    }
+
+    public long id;
+    public String userName;
+    public String password;
+    public UserType type;
+    public Instant createdAt;
+    public List<Order> orders; // Relationship: One User to Many Orders
+
+    public static void saveToFileBinary(List<User> users, String filePath) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(users);
+        }
+    }
+
+    public static List<User> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            return (List<User>) ois.readObject();
+        }
+    }
+}
+
+class Modls {
+
+    public long id;
+    public String name;
+    public long quantity;
+    public List<MealComponent> mealComponents; // Relationship: One Meal to Many MealComponents
+
+    public static void saveToFileBinary(List<Modls> meals, String filePath) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(meals);
+        }
+    }
+
+    public static List<Modls> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            return (List<Modls>) ois.readObject();
+        }
+    }
+}
+
+class Order {
+
+    public enum OrderStatus {
+        PENDING, COMPLETED, CANCELLED
+    }
+
+    public long id;
+    public long userId;
+    public OrderStatus orderStatus;
+    public long totalPrice;
+    public long tips;
+    public long status;
+    public long orderType;
+    public Instant createdAt;
+    public User user; // Relationship: Many Orders to One User
+    public List<OrderDetail> orderDetails; // Relationship: One Order to Many OrderDetails
+
+    public static void saveToFileBinary(List<Order> orders, String filePath) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(orders);
+        }
+    }
+
+    public static List<Order> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            return (List<Order>) ois.readObject();
+        }
+    }
+}
 /*
 class Meal implements Serializable {
 
@@ -117,23 +164,7 @@ class Meal implements Serializable {
     }
 }
  */
-class Notification implements Serializable {
-
-    public long id;
-    public String title;
-    public String message;
-    public User user;
-
-    public static void addNotification(List<Notification> notifications, Notification notification) {
-        notifications.add(notification);
-    }
-
-    public static void deleteNotification(List<Notification> notifications, long notificationId) {
-        notifications.removeIf(n -> n.id == notificationId);
-    }
-}
-
-/* 
+ /* 
 class User implements Serializable {
 
     public enum UserType {
@@ -200,88 +231,47 @@ class User implements Serializable {
     }
 }
  */
-
-class User {
-
-    public enum UserType {
-        ADMIN, CUSTOMER, MANAGER, EMPLOYEE
-    }
-
-    public long id;
-    public String userName;
-    public String password;
-    public UserType type;
-    public Instant createdAt;
-    public List<Order> orders; // Relationship: One User to Many Orders
-
-    // Getters and Setters
-    // Constructor(s)
-    // toString() method (optional)
-    public static void saveToFileBinary(List<User> users, String filePath) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(users);
-        }
-    }
-
-    public static List<User> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<User>) ois.readObject();
-        }
-    }
+ /* 
+enum orderStatus {
+    pending, preparing, delivered, cancelled
 }
 
- class Modls {
-
-    public long id;
-    public String name;
-    public long quantity;
-    public List<MealComponent> mealComponents; // Relationship: One Meal to Many MealComponents
-
-    // Getters and Setters
-    // Constructor(s)
-    // toString() method (optional)
-    public static void saveToFileBinary(List<Modls> meals, String filePath) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(meals);
-        }
-    }
-
-    public static List<Modls> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<Modls>) ois.readObject();
-        }
-    }
+enum orderType {
+    dinein, delivery
 }
 
-class Order {
 
-    public enum OrderStatus {
-        PENDING, COMPLETED, CANCELLED
-    }
+class Order implements Serializable {
 
     public long id;
     public long userId;
-    public OrderStatus orderStatus;
+    public orderStatus status;
+    public orderType type;
     public long totalPrice;
     public long tips;
-    public long status;
-    public long orderType;
     public Instant createdAt;
-    public User user; // Relationship: Many Orders to One User
-    public List<OrderDetail> orderDetails; // Relationship: One Order to Many OrderDetails
+    public User user;
+    public List<OrderDetail> orderDetails;
 
-    // Getters and Setters
-    // Constructor(s)
-    // toString() method (optional)
-    public static void saveToFileBinary(List<Order> orders, String filePath) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(orders);
+    public static void addOrder(List<Order> orders, Order order) {
+        orders.add(order);
+    }
+
+    public static void deleteOrder(List<Order> orders, long orderId) {
+        orders.removeIf(o -> o.id == orderId);
+    }
+
+    public static void updateOrder(List<Order> orders, Order updatedOrder) {
+        for (int i = 0; i < orders.size(); i++) {
+            if (orders.get(i).id == updatedOrder.id) {
+                orders.set(i, updatedOrder);
+                break;
+            }
         }
     }
 
-    public static List<Order> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<Order>) ois.readObject();
-        }
+    public static Order getOrderById(List<Order> orders, long orderId) {
+        return orders.stream().filter(o -> o.id == orderId).findFirst().orElse(null);
     }
 }
+ */

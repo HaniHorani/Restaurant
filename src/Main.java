@@ -1,6 +1,4 @@
-package src;
-
-import javax.swing.*;
+import src.Login;
 
 public class Main {
 
