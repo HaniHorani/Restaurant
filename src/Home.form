@@ -90,11 +90,12 @@
         <border type="none"/>
         <children>
           <component id="789d7" class="javax.swing.JLabel" binding="toplabel">
-            <constraints border-constraint="West"/>
+            <constraints border-constraint="Center"/>
             <properties>
               <background color="-2485982"/>
               <font name="Cocon"/>
-              <foreground color="-1712293"/>
+              <foreground color="-1"/>
+              <horizontalAlignment value="0"/>
               <horizontalTextPosition value="0"/>
               <text value="Home"/>
             </properties>
