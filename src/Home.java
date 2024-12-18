@@ -21,6 +21,9 @@ public class Home extends JFrame implements ActionListener{
     private JPanel userspanel;
 
     public Home() {
+        usersButton.setVisible(false);
+        if(Helper.myUser.type == User.UserType.ADMIN )
+            usersButton.setVisible(true);
         this.setSize(800,600);
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -31,13 +34,10 @@ public class Home extends JFrame implements ActionListener{
         usersButton.addActionListener(this);
 
         orederspanel = new JPanel();
-        userspanel = new JPanel();
+        userspanel = new userpanel();
 
         orederspanel.setBackground(Color.RED);
         orederspanel.setOpaque(true);
-
-        userspanel.setBackground(Color.BLUE);
-        userspanel.setOpaque(true);
 
         Home.setOpaque(true);
         this.add(panel1);
@@ -69,6 +69,18 @@ public class Home extends JFrame implements ActionListener{
             center.add(userspanel);
             panel1.revalidate();
         }
+        else if (e.getSource()==logoutButton){
+            int option=JOptionPane.showOptionDialog(null,"Are you sure you want to logout?","logout",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,null,null);
+            if(option==0){
+             Helper.myUser=null;
+             new Login();
+             this.dispose();
+            }
+        }
+
     }
 
 }
+
+
+

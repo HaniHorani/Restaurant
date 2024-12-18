@@ -1,5 +1,5 @@
 package src;
 public class Helper {
 
-    public static User myUser;
+    public static User myUser = new User();
 }
