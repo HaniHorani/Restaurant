@@ -3,8 +3,11 @@ package src;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
+import src.models.User;
 
 public class Login extends JFrame implements ActionListener {
 
@@ -99,7 +102,7 @@ public class Login extends JFrame implements ActionListener {
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        SginButton = new JButton("sgin up");
+        SginButton = new JButton("sign up");
         SginButton.setFont(cocon);
         SginButton.setForeground(new Color(64, 123, 255));
         SginButton.setBackground(Color.WHITE);
@@ -114,6 +117,7 @@ public class Login extends JFrame implements ActionListener {
         this.add(mainPanel);
 
         this.pack();
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
     }
 
@@ -130,6 +134,29 @@ public class Login extends JFrame implements ActionListener {
         } else if (e.getSource() == loginButton) {
             loginame = userTextField.getText();
             loginpassword = new String(passField.getPassword());
+            if (loginame.isEmpty()
+                    || loginpassword.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            try {
+                List<User> currentUsres;
+                currentUsres = User.loadFromFile();
+                for (User u : currentUsres) {
+                    if (u.userName.equals(loginame) && u.password.equals(loginpassword)) {
+                        System.out.println("==================================");
+                        Helper.myUser = u;
+                        this.dispose();
+                        new Home();
+                        break;
+                    }
+                }
+                if (Helper.myUser.userName == null) {
+                    JOptionPane.showMessageDialog(null, "User not found", "Falied", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (IOException | ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
 
         }
     }
@@ -177,8 +204,10 @@ class Register extends JPanel implements ActionListener {
     JButton acceptButton;
     String newusername;
     String newpassword;
+    String confirmpassword;
     JTextField newuserTextField;
     JTextField newpassField;
+    JTextField confirmPassField;
 
     public Register() {
         this.setLayout(new GridBagLayout());
@@ -188,7 +217,7 @@ class Register extends JPanel implements ActionListener {
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Resizer imagePanel = new Resizer("images\\Accept request-bro.png");
+        Resizer imagePanel = new Resizer("images\\Sign up-amico.png");
         imagePanel.setBackground(Color.white);
         imagePanel.setPreferredSize(new Dimension(500, 300));
         gbc.gridx = 0;
@@ -197,7 +226,7 @@ class Register extends JPanel implements ActionListener {
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(imagePanel, gbc);
 
-        JLabel userLabel = new JLabel("New Username:");
+        JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(cocon);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -212,19 +241,20 @@ class Register extends JPanel implements ActionListener {
                 new LineBorder(Color.BLACK, 1),
                 new EmptyBorder(10, 10, 10, 10)
         ));
+
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         this.add(newuserTextField, gbc);
 
-        JLabel passLabel = new JLabel("New Password:");
+        JLabel passLabel = new JLabel("Password:");
         passLabel.setFont(cocon);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
         this.add(passLabel, gbc);
 
-        newpassField = new JTextField();
+        newpassField = new JPasswordField();
         newpassField.setFont(cocon);
         newpassField.setPreferredSize(new Dimension(300, 40));
         newpassField.setBorder(BorderFactory.createCompoundBorder(
@@ -236,14 +266,33 @@ class Register extends JPanel implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         this.add(newpassField, gbc);
 
-        acceptButton = new JButton("accept");
+        JLabel confirmPassLabel = new JLabel("Confirm Password:");
+        confirmPassLabel.setFont(cocon);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        this.add(confirmPassLabel, gbc);
+
+        confirmPassField = new JPasswordField();
+        confirmPassField.setFont(cocon);
+        confirmPassField.setPreferredSize(new Dimension(300, 40));
+        confirmPassField.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(Color.BLACK, 1),
+                new EmptyBorder(10, 10, 10, 10)
+        ));
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        this.add(confirmPassField, gbc);
+
+        acceptButton = new JButton("Save");
         acceptButton.setFont(cocon);
         acceptButton.setForeground(Color.WHITE);
         acceptButton.setBackground(new Color(64, 123, 255));
         acceptButton.setPreferredSize(new Dimension(150, 40));
         acceptButton.addActionListener(this);
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         acceptButton.setFocusable(false);
@@ -257,10 +306,41 @@ class Register extends JPanel implements ActionListener {
         if (e.getSource() == acceptButton) {
             newusername = newuserTextField.getText();
             newpassword = newpassField.getText();
+            confirmpassword = confirmPassField.getText();
+            if (newusername.isEmpty() || newpassword.isEmpty() || confirmpassword.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            // while (true) {
+            if (!(newpassword.equals(confirmpassword))) {
+                JOptionPane.showMessageDialog(null, "Password mismatch", "Falied", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            User newuser = new User();
+            newuser.userName = newusername;
+            newuser.password = newpassword;
+            newuser.type = User.UserType.CUSTOMER;
 
-            JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
-            temp.dispose();
-            new Login();
+            try {
+                List<User> currentusers = User.loadFromFile();
+                if (User.check(newuser)) {
+                    currentusers.add(newuser);
+                } else {
+                    JOptionPane.showMessageDialog(null, "The User is already exsit", "Falied", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                User.saveToFile(currentusers);
+
+                JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
+                temp.dispose();
+                Helper.myUser = newuser;
+                new Home();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+
         }
     }
 }

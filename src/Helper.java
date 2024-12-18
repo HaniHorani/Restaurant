@@ -6,7 +6,7 @@ import src.models.User;
 
 public class Helper implements Serializable {
 
-    public static User myUser;
+    public static User myUser=new User();
     public static String usersPath = FileUtils.getOrCratePath("users");
     public static String mealsPath = FileUtils.getOrCratePath("meals");
     public static String componentsPath = FileUtils.getOrCratePath("components");
