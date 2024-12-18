@@ -1,139 +1,72 @@
-package src;
+package src.models;
+
 import java.io.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import src.Helper;
 
-class OrderDetail implements Serializable {
-
-    public long orderId;
-    public long mealId;
-    public long count;
-    public Order order;
-    public Models meal;
-
-    public static void addOrderDetail(List<OrderDetail> details, OrderDetail detail) {
-        details.add(detail);
-    }
-
-    public static void deleteOrderDetail(List<OrderDetail> details, long orderId, long mealId) {
-        details.removeIf(d -> d.orderId == orderId && d.mealId == mealId);
-    }
-}
-
-class Component implements Serializable {
-
-    public long id;
-    public String name;
-    public List<MealComponent> mealComponents;
-
-    public static void addComponent(List<Component> components, Component component) {
-        components.add(component);
-    }
-
-    public static void deleteComponent(List<Component> components, long componentId) {
-        components.removeIf(c -> c.id == componentId);
-    }
-}
-
-class MealComponent implements Serializable {
-
-    public long mealId;
-    public long componentId;
-    public Models meal;
-    public Component component;
-}
-
-class Notification implements Serializable {
-
-    public long id;
-    public String title;
-    public String message;
-    public User user;
-
-    public static void addNotification(List<Notification> notifications, Notification notification) {
-        notifications.add(notification);
-    }
-
-    public static void deleteNotification(List<Notification> notifications, long notificationId) {
-        notifications.removeIf(n -> n.id == notificationId);
-    }
-}
-
-class User {
+public class User implements Serializable {
 
     public enum UserType {
         ADMIN, CUSTOMER, MANAGER, EMPLOYEE
     }
-
+    private static final String filePath = Helper.usersPath;
     public long id;
     public String userName;
     public String password;
     public UserType type;
-    public Instant createdAt;
+    public Instant createdAt = Instant.now();
     public List<Order> orders; // Relationship: One User to Many Orders
+    public List<Notification> notification; // Relationship: One User to Many Orders
 
-    public static void saveToFileBinary(List<User> users, String filePath) throws IOException {
+    public User() {
+    }
+
+    public User(String userName, String password, UserType type) {
+        this.userName = userName;
+        this.password = password;
+        this.type = type;
+    }
+
+    public static Boolean check(User newUser) throws ClassNotFoundException, IOException {
+        List<User> users = loadFromFile();
+        for (User user : users) {
+            if (newUser.userName.equals(user.userName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void saveToFile(List<User> users) throws IOException {
+        System.out.println("=================" + filePath + "=================");
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(users);
         }
     }
 
-    public static List<User> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
+    public static List<User> loadFromFile() throws IOException, ClassNotFoundException {
+        if (new File(filePath).length() == 0) {
+            System.out.println("File is empty. Returning an empty list.");
+            List<User> users = new ArrayList<>();
+            users.add(new User("hani", "123", UserType.ADMIN));
+            saveToFile(users);
+            return users;
+        }
+
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
             return (List<User>) ois.readObject();
         }
     }
 }
 
-class Models {
-
-    public long id;
-    public String name;
-    public long quantity;
-    public List<MealComponent> mealComponents; // Relationship: One Meal to Many MealComponents
-
-    public static void saveToFileBinary(List<Models> meals, String filePath) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(meals);
-        }
-    }
-
-    public static List<Models> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<Models>) ois.readObject();
-        }
-    }
+class Notification implements Serializable {
+    public String title;
+    public String message;
+    // public User user;
 }
 
-class Order {
-
-    public enum OrderStatus {
-        PENDING, COMPLETED, CANCELLED
-    }
-
-    public long id;
-    public long userId;
-    public OrderStatus orderStatus;
-    public long totalPrice;
-    public long tips;
-    public long status;
-    public long orderType;
-    public Instant createdAt;
-    public User user; // Relationship: Many Orders to One User
-    public List<OrderDetail> orderDetails; // Relationship: One Order to Many OrderDetails
-
-    public static void saveToFileBinary(List<Order> orders, String filePath) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(orders);
-        }
-    }
-
-    public static List<Order> loadFromFileBinary(String filePath) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<Order>) ois.readObject();
-        }
-    }
-}
 /*
 class Meal implements Serializable {
 
