@@ -1,7 +1,6 @@
 package src.models;
 
 import java.io.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,16 +10,17 @@ import src.Helper;
 public class User implements Serializable {
 
     public enum UserType {
-        ADMIN, CUSTOMER, MANAGER, EMPLOYEE
+        ADMIN, CUSTOMER, EMPLOYEE
     }
+    
     private static final String filePath = Helper.usersPath;
     public long id;
     public String userName;
     public String password;
     public UserType type;
     public String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-    public List<Order> orders; // Relationship: One User to Many Orders
-    public List<Notification> notification; // Relationship: One User to Many Orders
+    public List<Order> orders;
+    public List<UserNotification> notification;
 
     public User() {
     }
@@ -63,10 +63,16 @@ public class User implements Serializable {
     }
 }
 
-class Notification implements Serializable {
-    public String title;
+class UserNotification implements Serializable {
+    public String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    // public String title;
     public String message;
+    public Order order;
     // public User user;
+    public UserNotification(String message, Order order) {
+        this.message = message;
+        this.order = order;
+    }
 }
 
 /*

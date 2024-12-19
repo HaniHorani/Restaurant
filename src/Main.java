@@ -8,7 +8,7 @@ public class Main {
             new Login();
     }
 }
-/*         
+/*
 List<User> users = User.loadFromFile();
 
 for (int i = 0; i < 10; i++) {

@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
+
+import src.models.Order;
 import src.models.User;
+// import src.models.UserNotification;
 
 public class Login extends JFrame implements ActionListener {
 
@@ -326,7 +329,8 @@ class Register extends JPanel implements ActionListener {
                 if (User.check(newuser)) {
                     currentusers.add(newuser);
                 } else {
-                    JOptionPane.showMessageDialog(null, "The User is already exsit", "Falied", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "The User is already exsit", "Falied",
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 User.saveToFile(currentusers);
