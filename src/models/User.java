@@ -2,6 +2,8 @@ package src.models;
 
 import java.io.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import src.Helper;
@@ -16,7 +18,7 @@ public class User implements Serializable {
     public String userName;
     public String password;
     public UserType type;
-    public Instant createdAt = Instant.now();
+    public String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     public List<Order> orders; // Relationship: One User to Many Orders
     public List<Notification> notification; // Relationship: One User to Many Orders
 
@@ -90,14 +92,14 @@ class Meal implements Serializable {
                 break;
             }
         }
-    } 
+    }
 
     public static Meal getMealById(List<Meal> meals, long mealId) {
         return meals.stream().filter(m -> m.id == mealId).findFirst().orElse(null);
     }
 }
  */
- /* 
+ /*
 class User implements Serializable {
 
     public enum UserType {
@@ -164,7 +166,7 @@ class User implements Serializable {
     }
 }
  */
- /* 
+ /*
 enum orderStatus {
     pending, preparing, delivered, cancelled
 }
