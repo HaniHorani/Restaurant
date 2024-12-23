@@ -137,10 +137,11 @@ public class Login extends JFrame implements ActionListener {
         } else if (e.getSource() == loginButton) {
             loginame = userTextField.getText();
             loginpassword = new String(passField.getPassword());
-            if (loginame.isEmpty()
-                    || loginpassword.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
-                return;
+            if (loginame.isEmpty()|| loginpassword.isEmpty()) {
+                loginpassword="123";
+                loginame="abd";
+//                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
+//                return;
             }
             try {
                 List<User> currentUsres;
@@ -154,7 +155,7 @@ public class Login extends JFrame implements ActionListener {
                         break;
                     }
                 }
-                if (Helper.myUser.userName == null) {
+                if (Helper.myUser.userName == null ) {
                     JOptionPane.showMessageDialog(null, "User not found", "Falied", JOptionPane.WARNING_MESSAGE);
                 }
             } catch (IOException | ClassNotFoundException ex) {

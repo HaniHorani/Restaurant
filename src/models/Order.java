@@ -30,6 +30,11 @@ public class Order implements Serializable {
     private long tips;
     private OrderType orderType;
     private String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+    public void setCompletedAt(String completedAt) {
+        this.completedAt = completedAt;
+    }
+
     private String completedAt;
     private List<OrderDetail> orderDetails;
 
@@ -78,8 +83,8 @@ public class Order implements Serializable {
         this.orderType = orderType;
         this.completedAt = completedAt;
         this.orderDetails = orderDetails;
-        // this.id= loadFromFile().getLast()==null?1:loadFromFile().getLast().id+1;
-        this.id= (loadFromFile().getLast().id)+1;
+         //this.id= loadFromFile().getLast()==null?1:loadFromFile().getLast().id+1;
+        //this.id= (loadFromFile().getLast().id)+1;
     }
 
     public static void saveToFile(List<Order> orders) throws IOException {
@@ -99,10 +104,3 @@ public class Order implements Serializable {
     }
 }
 
-class OrderDetail implements Serializable {
-    public long orderId;
-    public long mealId;
-    public long count;
-    public Order order;
-    public Meal meal;
-}
