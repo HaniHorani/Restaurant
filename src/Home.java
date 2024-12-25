@@ -44,7 +44,7 @@ public class Home extends JFrame  {
             orederspanel = new cashirpanel();
         }
         else{
-            mealspanel=new JPanel();
+            mealspanel=new mealpanel();
             orederspanel= new manegementpanel();
         }
         userspanel = new userpanel();
@@ -63,6 +63,16 @@ public class Home extends JFrame  {
                 panel1.revalidate();
             }
         });
+        mealsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                center.removeAll();
+                panel1.repaint();
+                toplabel.setText("Meals");
+                center.add(mealspanel);
+                panel1.revalidate();
+            }
+    });
         orderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,7 +117,7 @@ public class Home extends JFrame  {
         this.add(panel1);
         this.setVisible(true);
     }
-   public void logout(){
+   private void logout(){
         int option = JOptionPane.showOptionDialog(null, "Are you sure you want to logout?", "logout", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
         if (option == 0) {
             Helper.myUser.userName = null;

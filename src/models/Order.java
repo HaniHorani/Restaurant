@@ -25,6 +25,11 @@ public class Order implements Serializable {
     // private static long maxId;
     private long id ;
     private User user;
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
     private OrderStatus orderStatus = OrderStatus.PENDING;
     private long totalPrice;
     private long tips;
@@ -75,13 +80,13 @@ public class Order implements Serializable {
     }
 
     public Order(User user, OrderStatus orderStatus, long totalPrice, long tips, OrderType orderType,
-            String completedAt, List<OrderDetail> orderDetails) throws ClassNotFoundException, IOException {
+             List<OrderDetail> orderDetails) throws ClassNotFoundException, IOException {
         this.user = user;
         this.orderStatus = orderStatus;
         this.totalPrice = totalPrice;
         this.tips = tips;
         this.orderType = orderType;
-        this.completedAt = completedAt;
+//        this.completedAt = completedAt;
         this.orderDetails = orderDetails;
          //this.id= loadFromFile().getLast()==null?1:loadFromFile().getLast().id+1;
         //this.id= (loadFromFile().getLast().id)+1;

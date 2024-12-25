@@ -2,12 +2,15 @@ package src;
 import src.models.Meal;
 import src.models.Order;
 import src.models.OrderDetail;
+import src.models.UserNotification;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class cashirpanel extends JPanel {
     private JLabel totalLabel;
     private JTextField tipField;
     private JLabel grandTotalLabel;
+    private JComboBox<String> orderType;
 
     public cashirpanel() {
         this.setLayout(new BorderLayout());
@@ -54,11 +58,11 @@ public class cashirpanel extends JPanel {
         JPanel foodPanel = new JPanel(new GridLayout(5, 1, 10, 10));
         foodPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        addFoodButton(foodPanel, "Burger", 5.00);
-        addFoodButton(foodPanel, "Pizza", 8.00);
-        addFoodButton(foodPanel, "Pasta", 7.00);
-        addFoodButton(foodPanel, "Salad", 4.00);
-        addFoodButton(foodPanel, "Drink", 2.00);
+        addfoodbutton(foodPanel, "Burger", (long) 5.00);
+        addfoodbutton(foodPanel, "Pizza", (long)8.00);
+        addfoodbutton(foodPanel, "Pasta", (long)7.00);
+        addfoodbutton(foodPanel, "Salad", (long)4.00);
+        addfoodbutton(foodPanel, "Drink", (long)2.00);
 
         rightPanel.add(foodPanel, BorderLayout.NORTH);
 
@@ -70,7 +74,7 @@ public class cashirpanel extends JPanel {
         orderTypePanel.setLayout(new BoxLayout(orderTypePanel, BoxLayout.Y_AXIS));
         JLabel orderTypeLabel = new JLabel("Order Type");
         orderTypeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JComboBox<String> orderType = new JComboBox<>(new String[]{"In Resturant", "Delivery", "Else"});
+        orderType = new JComboBox<>(new String[]{"In Resturant", "Delivery", "Else"});
         orderType.setMaximumSize(new Dimension(200, 30));
 
         orderTypePanel.add(orderTypeLabel);
@@ -78,19 +82,32 @@ public class cashirpanel extends JPanel {
         orderTypePanel.add(orderType);
 
         JButton saleButton = new JButton("SALE");
-        saleButton.addActionListener(e -> {
-            List<OrderDetail> orderDetails = new ArrayList<>();
-            orderDetails.add(new OrderDetail(1,new Meal()));
-//            new Order();
+        saleButton.addActionListener(e -> {try{
 
+            List<OrderDetail> orderDetails = getdetalis();
+            Order.OrderType currenttype= getCurrentordertype() ;
+            orderDetails.add(new OrderDetail(1,new Meal()));
+            double dgrandTotal= Double.parseDouble(grandTotalLabel.getText());
+            long lgrandTotal = (long) dgrandTotal;
+            double dtip = Double.parseDouble(tipField.getText());
+            long ltip = (long) dtip;
+            Order myorder=new Order(Helper.myUser, Order.OrderStatus.PENDING,lgrandTotal,ltip,currenttype,orderDetails);
+            List<Order>myorders=Order.loadFromFile();
+            myorders.add(myorder);
+            Order.saveToFile(myorders);
             int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to confirm?", "Confirm", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
+                Helper.myUser.notification = new ArrayList<>();
+                Helper.myUser.notification.add(new UserNotification("oreder been submited",myorder));
                 tableModel.setRowCount(0);
                 totalLabel.setText("0.0");
                 tipField.setText("");
                 grandTotalLabel.setText("0.0");
                 JOptionPane.showMessageDialog(this, "Sale completed!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
+        }catch (IOException | NumberFormatException| ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(this, "Error Submitting Order: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         });
 
         saleButton.setFocusable(false);
@@ -128,17 +145,17 @@ public class cashirpanel extends JPanel {
         tipField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                calculateGrandTotal();
+                calculategrandtotal();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                calculateGrandTotal();
+                calculategrandtotal();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                calculateGrandTotal();
+                calculategrandtotal();
             }
         });
         summaryPanel.add(tipField, gbc);
@@ -154,14 +171,14 @@ public class cashirpanel extends JPanel {
         this.add(summaryPanel, BorderLayout.SOUTH);
     }
 
-    private void addFoodButton(JPanel panel, String foodName, double price) {
-        JButton foodButton = new JButton(foodName + " ($" + (int) price + ")");
+    private void addfoodbutton(JPanel panel, String foodName, long price) {
+        JButton foodButton = new JButton(foodName + " ($" +  price + ")");
         foodButton.setFocusable(false);
-        foodButton.addActionListener(e -> updateFoodInTable(foodName, price));
+        foodButton.addActionListener(e -> updatefoodintable(foodName, price));
         panel.add(foodButton);
     }
 
-    private void updateFoodInTable(String foodName, double price) {
+    private void updatefoodintable(String foodName, double price) {
         boolean itemExists = false;
 
         for (int row = 0; row < tableModel.getRowCount(); row++) {
@@ -183,19 +200,19 @@ public class cashirpanel extends JPanel {
             tableModel.addRow(new Object[]{foodName, price, quantity, total});
         }
 
-        updateTotal();
+        updatetotal();
     }
 
-    private void updateTotal() {
+    private void updatetotal() {
         double total = 0.0;
         for (int row = 0; row < tableModel.getRowCount(); row++) {
             total += (double) tableModel.getValueAt(row, 3);
         }
         totalLabel.setText(String.format("%.2f", total));
-        calculateGrandTotal();
+        calculategrandtotal();
     }
 
-    private void calculateGrandTotal() {
+    private void calculategrandtotal() {
         try {
             double total = Double.parseDouble(totalLabel.getText());
             double tip = tipField.getText().isEmpty() ? 0.0 : Double.parseDouble(tipField.getText());
@@ -205,4 +222,22 @@ public class cashirpanel extends JPanel {
             grandTotalLabel.setText("Error");
         }
     }
+private Order.OrderType getCurrentordertype(){
+        if (orderType.getSelectedItem()=="In Resturant"){
+            return Order.OrderType.ON_TABLE;
+        }else if (orderType.getSelectedItem()== "Delivery"){
+            return Order.OrderType.DELEVERE;
+        }else{
+            return Order.OrderType.PRIVATE_OR_OTHER;
+        }
+}
+private List<OrderDetail> getdetalis(){
+    List<OrderDetail> orderDetails = new ArrayList<>();
+    for (int i=0,j =0;i<table.getRowCount()&&j<table.getColumnCount();i++,j++){
+       // OrderDetail neworderdetals =new OrderDetail();
+
+    }
+
+    return orderDetails;
+}
 }

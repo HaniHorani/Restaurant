@@ -20,7 +20,7 @@ public class User implements Serializable {
     public UserType type;
     public String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     public List<Order> orders;
-    public List<UserNotification> notification;
+    public List<UserNotification> notification ;
 
     public User() {
     }

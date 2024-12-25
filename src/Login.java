@@ -138,8 +138,8 @@ public class Login extends JFrame implements ActionListener {
             loginame = userTextField.getText();
             loginpassword = new String(passField.getPassword());
             if (loginame.isEmpty()|| loginpassword.isEmpty()) {
+                loginame="bahaa";
                 loginpassword="123";
-                loginame="abd";
 //                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
 //                return;
             }

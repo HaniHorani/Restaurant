@@ -1,7 +1,11 @@
 package src;
+import src.models.Order;
+import src.models.UserNotification;
+
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
 
