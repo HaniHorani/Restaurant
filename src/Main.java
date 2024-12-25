@@ -1,16 +1,18 @@
 package src;
-import src.models.Order;
-import src.models.UserNotification;
+import src.models.Component;
+import src.models.Meal;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.awt.*;
 
 public class Main {
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-            new Login();
+    public static void main(String[] args) {
+        new Login();
     }
 }
 /*

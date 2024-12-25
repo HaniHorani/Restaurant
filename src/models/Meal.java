@@ -16,16 +16,15 @@ public class Meal implements Serializable {
     private static String filePath = Helper.mealsPath;
     public long id;
     public String name;
-    public long quantity;
+//    public long quantity;
     public long Price;
     public List<Component> components;
 
     public Meal() {
     }
-
-    public Meal(String name, long quantity,long Price, List<Component> components) {
+    public Meal(String name,long Price, List<Component> components) {
         this.name = name;
-        this.quantity = quantity;
+//        this.quantity = quantity;
         this.Price=Price;
         this.components = components;
     }

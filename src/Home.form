@@ -90,7 +90,7 @@
               <borderPainted value="false"/>
               <focusable value="false"/>
               <foreground color="-1"/>
-              <icon value="images/notifications.png"/>
+              <icon value="images/botifications1.png"/>
               <text value="Notifications"/>
             </properties>
           </component>
@@ -107,6 +107,7 @@
               <focusPainted value="false"/>
               <focusable value="false"/>
               <foreground color="-1"/>
+              <icon value="images/hamburger.png"/>
               <text value="Meals"/>
             </properties>
           </component>

@@ -17,7 +17,14 @@ public class Component implements Serializable {
     public String name;
     // public List<Meal> meals;
 
-    public static Boolean check(Component newComponent,  List<Component> components) throws ClassNotFoundException, IOException {
+    public Component() {
+    }
+
+    public Component(String name) {
+        this.name = name;
+    }
+
+    public static Boolean check(Component newComponent, List<Component> components) throws ClassNotFoundException, IOException {
         for (Component component : components) {
             if (newComponent.name.equals(component.name)) {
                 return false;

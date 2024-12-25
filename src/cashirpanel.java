@@ -23,8 +23,14 @@ public class cashirpanel extends JPanel {
     private JTextField tipField;
     private JLabel grandTotalLabel;
     private JComboBox<String> orderType;
+    private List<Meal> meals;
 
     public cashirpanel() {
+            try {
+                meals=Meal.loadFromFile();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         this.setLayout(new BorderLayout());
 
         JPanel mainContent = new JPanel(new BorderLayout());
@@ -55,16 +61,20 @@ public class cashirpanel extends JPanel {
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setPreferredSize(new Dimension(250, 0));
 
-        JPanel foodPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        JPanel foodPanel =new  JPanel();    //new JPanel(new GridLayout(meals.size(), 1, 10, 10));
+        foodPanel.setLayout(new BoxLayout(foodPanel, BoxLayout.Y_AXIS));
         foodPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        addfoodbutton(foodPanel, "Burger", (long) 5.00);
-        addfoodbutton(foodPanel, "Pizza", (long)8.00);
-        addfoodbutton(foodPanel, "Pasta", (long)7.00);
-        addfoodbutton(foodPanel, "Salad", (long)4.00);
-        addfoodbutton(foodPanel, "Drink", (long)2.00);
-
-        rightPanel.add(foodPanel, BorderLayout.NORTH);
+                for(Meal meal:meals){
+                    addfoodbutton(foodPanel,meal.name,meal.Price);
+                }
+        JScrollPane scrollPane = new JScrollPane(foodPanel);
+        rightPanel.add(scrollPane, BorderLayout.CENTER);
+//        addfoodbutton(foodPanel, "Burger", (long) 5.00);
+//        addfoodbutton(foodPanel, "Pizza", (long)8.00);
+//        addfoodbutton(foodPanel, "Pasta", (long)7.00);
+//        addfoodbutton(foodPanel, "Salad", (long)4.00);
+//        addfoodbutton(foodPanel, "Drink", (long)2.00);
+        //rightPanel.add(foodPanel, BorderLayout.NORTH);
 
         JPanel actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
@@ -141,7 +151,7 @@ public class cashirpanel extends JPanel {
         summaryPanel.add(new JLabel("Tip:"), gbc);
 
         gbc.gridx = 1;
-        tipField = new JTextField();
+        tipField = new JTextField("0.0");
         tipField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -177,7 +187,6 @@ public class cashirpanel extends JPanel {
         foodButton.addActionListener(e -> updatefoodintable(foodName, price));
         panel.add(foodButton);
     }
-
     private void updatefoodintable(String foodName, double price) {
         boolean itemExists = false;
 
