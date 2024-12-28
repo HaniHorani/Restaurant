@@ -1,6 +1,7 @@
 package src;
+
+import src.models.*;
 import src.models.Component;
-import src.models.Meal;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +13,20 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        new Login();
+       new Login();
+//       try {
+//           List<User> users = User.loadFromFile();
+//           for (User user : users) {
+////               if (user.userName.equals("bahaa") && user.password.equals("123")) {
+//                   user.notification = new ArrayList<>();
+//                   System.out.println("Emptyed notifications");
+////               }
+//           }
+//           System.out.println("Saved sucessful");
+//           User.saveToFile(users);
+//       } catch (IOException | ClassNotFoundException e) {
+//           throw new RuntimeException(e);
+//       }
     }
 }
 /*

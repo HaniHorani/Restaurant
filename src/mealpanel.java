@@ -1,7 +1,7 @@
 package src;
+
 import src.models.Component;
 import src.models.Meal;
-
 import javax.imageio.IIOException;
 import javax.swing.*;
 import java.awt.*;

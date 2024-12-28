@@ -21,27 +21,28 @@ public class Order implements Serializable {
     public enum OrderType {
         DELEVERE ,ON_TABLE ,PRIVATE_OR_OTHER
     }
-
-    // private static long maxId;
-    private long id ;
-    private User user;
-
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
+    public enum OrderPay {
+        Cash,Card
     }
 
+    // private static long maxId;
+//    private static long id = 1;
+    private long id;
+    private User user;
     private OrderStatus orderStatus = OrderStatus.PENDING;
     private long totalPrice;
     private long tips;
     private OrderType orderType;
+    private OrderPay orderPay;
     private String createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-
+    private String completedAt;
+    private List<OrderDetail> orderDetails;
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
     public void setCompletedAt(String completedAt) {
         this.completedAt = completedAt;
     }
-
-    private String completedAt;
-    private List<OrderDetail> orderDetails;
 
     public long getId() {
         return id;
@@ -78,18 +79,27 @@ public class Order implements Serializable {
     public List<OrderDetail> getOrderDetails() {
         return orderDetails;
     }
+    public OrderPay getOrderPay() {
+        return orderPay;
+    }
 
-    public Order(User user, OrderStatus orderStatus, long totalPrice, long tips, OrderType orderType,
+    public Order(User user, OrderStatus orderStatus, long totalPrice, long tips, OrderType orderType, OrderPay orderPay,
              List<OrderDetail> orderDetails) throws ClassNotFoundException, IOException {
         this.user = user;
         this.orderStatus = orderStatus;
         this.totalPrice = totalPrice;
         this.tips = tips;
         this.orderType = orderType;
-//        this.completedAt = completedAt;
+        this.orderPay = orderPay;
         this.orderDetails = orderDetails;
          //this.id= loadFromFile().getLast()==null?1:loadFromFile().getLast().id+1;
         //this.id= (loadFromFile().getLast().id)+1;
+        List<Order> orders = loadFromFile();
+        if (orders.isEmpty()) {
+            this.id = 1;
+        } else {
+            this.id = orders.get(orders.size() - 1).id + 1;
+        }
     }
 
     public static void saveToFile(List<Order> orders) throws IOException {

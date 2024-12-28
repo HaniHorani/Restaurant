@@ -1,7 +1,6 @@
 package src;
 
 import src.models.User;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -45,10 +44,7 @@ public class userpanel extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int option = JOptionPane.showOptionDialog(null, "Are you sure you want to delete?", "Delete", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-                if (option == 0) {
                    deleteUser();
-                }
             }
         });
 
@@ -147,19 +143,22 @@ public class userpanel extends JPanel {
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a user to delete.", "Delete Error", JOptionPane.WARNING_MESSAGE);
             return;
+        }int response =JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this User?", "Delete", JOptionPane.ERROR_MESSAGE);
+        if(response==JOptionPane.YES_OPTION){
+            if(tableModel.getValueAt(selectedRow,2)!= User.UserType.ADMIN){
+                String selectedUserName = (String) tableModel.getValueAt(selectedRow, 0);
+                try {
+                    List<User> users = User.loadFromFile();
+                    users.removeIf(user -> user.userName.equals(selectedUserName));
+                    User.saveToFile(users);
+                    updateTable();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error deleting user: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            else
+                JOptionPane.showMessageDialog(this, "This is Admin User ", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        if(tableModel.getValueAt(selectedRow,2)!= User.UserType.ADMIN){
-        String selectedUserName = (String) tableModel.getValueAt(selectedRow, 0);
-        try {
-            List<User> users = User.loadFromFile();
-            users.removeIf(user -> user.userName.equals(selectedUserName));
-            User.saveToFile(users);
-            updateTable();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error deleting user: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-      }
-        else
-            JOptionPane.showMessageDialog(this, "This is Admin User ", "Error", JOptionPane.ERROR_MESSAGE);
     }
+
 }

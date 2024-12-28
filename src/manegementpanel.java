@@ -1,25 +1,25 @@
 package src;
 
-import src.models.Order;
+import src.models.*;
 
-import javax.swing.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class manegementpanel extends JPanel {
         private JTable table;
         private DefaultTableModel tableModel;
-        private JButton editButton, deleteButton;
+        private JButton acceptButton,detailButton ,cancelButton;
 
         public manegementpanel() {
             this.setLayout(new BorderLayout());
-
-            // أسماء الأعمدة
-            String[] columnNames = {"Order ID", "Customer Name", "Status"};
+            String[] columnNames = {"Order ID", "Customer Name", "Status","Created At"};
             tableModel = new DefaultTableModel(columnNames, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
@@ -27,52 +27,48 @@ public class manegementpanel extends JPanel {
                 }
             };
 
-            // إعداد الجدول
             table = new JTable(tableModel);
             table.getTableHeader().setReorderingAllowed(false);
 
             JScrollPane scrollPane = new JScrollPane(table);
             this.add(scrollPane, BorderLayout.CENTER);
 
-            // لوحة الأزرار
             JPanel buttonPanel = new JPanel();
             buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
-            editButton = new JButton("Edit Order");
-            editButton.addActionListener(e -> editOrder());
+            acceptButton = new JButton("Accept Order");
+            acceptButton.addActionListener(e -> acceptorder());
 
-            deleteButton = new JButton("Delete Order");
-            deleteButton.addActionListener(e -> cancelorder());
+            detailButton = new JButton("Show Detalis");
+            detailButton.addActionListener(e -> details());
 
-            buttonPanel.add(editButton);
-            buttonPanel.add(deleteButton);
+            cancelButton = new JButton("Cancel Order");
+            cancelButton.addActionListener(e -> cancelorder());
+
+            buttonPanel.add(acceptButton);
+            buttonPanel.add(detailButton);
+            buttonPanel.add(cancelButton);
 
             this.add(buttonPanel, BorderLayout.SOUTH);
 
-            // تحديث الجدول
             updateTable();
         }
-
-        // تحديث الجدول بالطلبات
         private void updateTable() {
             try{
                 tableModel.setRowCount(0);
                 List<Order> orders = Order.loadFromFile();
                 for (Order order : orders) {
-                       tableModel.addRow(new Object[]{order.getId(), order.getUser().userName,order.getOrderStatus()});
+                       tableModel.addRow(new Object[]{order.getId(), order.getUser().userName,order.getOrderStatus(),order.getCreatedAt()});
                 }
             }catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Error: " + e.getClass().getName() + " - " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         }
-
-
-        // تعديل طلب
-        private void editOrder() {
+        private void details() {
             int selectedRow = table.getSelectedRow();
             if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Please select an order to edit.", "Edit Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please select an order to show detalis.", "Show Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -81,34 +77,108 @@ public class manegementpanel extends JPanel {
                 List<Order> orders = Order.loadFromFile();
                 for (Order order : orders) {
                     if (order.getId() ==selectedOrderId) {
-                        Order.saveToFile(orders);
-                        updateTable();
+                        List<OrderDetail> orderDetails = order.getOrderDetails();
+                        String msg = "";
+                        for (OrderDetail orderDetail : orderDetails) {
+                            msg += (orderDetail.meal.name + " " + orderDetail.count + "\n");
+                        }
+                        JOptionPane.showMessageDialog(this, msg, "Details", JOptionPane.INFORMATION_MESSAGE);
                         return;
                     }
                 }
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error editing order: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error showing order: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
 
         private void cancelorder() {
             int selectedRow = table.getSelectedRow();
             if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Please select an order to delete.", "Delete Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please select an order to cancel.", "Cancel Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            int response =JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel this order?", "Cancel", JOptionPane.ERROR_MESSAGE);
+            if (response == JOptionPane.YES_OPTION) {
+                long selectedOrderId = (long) tableModel.getValueAt(selectedRow, 0);
+                try {
+                    List<Order> orders = Order.loadFromFile();
+                    for (Order order : orders) {
+                        if (order.getId() == selectedOrderId && order.getOrderStatus().equals(Order.OrderStatus.PENDING)) {
+                            order.setOrderStatus(Order.OrderStatus.CANCELLED);
+                            Order.saveToFile(orders);
+                            updateTable();
+                            if (Helper.myUser.notification == null) {
+                                Helper.myUser.notification = new ArrayList<>();
+                            }
+                            Helper.myUser.notification.add(new UserNotification("Order "+order.getId()+" been canceled",order));
+                            List<User> users = User.loadFromFile();
+                            for (User user : users) {
+                                if (user.userName.equals(Helper.myUser.userName)) {
+                                    user.notification = Helper.myUser.notification;
+                                }
 
-            long selectedOrderId = (long) tableModel.getValueAt(selectedRow, 0);
-            try {
-                List<Order> orders = Order.loadFromFile();
-                for(Order order : orders)
-                if(order.getId() ==selectedOrderId){
-                    order.setOrderStatus(Order.OrderStatus.CANCELLED);
+                            }
+                            User customerUser = order.getUser();
+                            for (User user : users) {
+                                if (user.userName.equals(customerUser.userName)) {
+                                    if (user.notification == null) {
+                                        user.notification = new ArrayList<>();
+                                    }
+                                    user.notification.add(new UserNotification("Order " + order.getId() + " has been canceled", order));
+                                }
+                            }
+                            User.saveToFile(users);
+                            return;
+                        }
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error canceling order: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                Order.saveToFile(orders);
-                updateTable();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error deleting order: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        private void acceptorder() {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Please select an order to accept.", "Accept Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int response =JOptionPane.showConfirmDialog(this, "Are you sure you want to accept this order?", "Accept", JOptionPane.ERROR_MESSAGE);
+            if (response == JOptionPane.YES_OPTION) {
+                long selectedOrderId = (long) tableModel.getValueAt(selectedRow, 0);
+                try {
+                    List<Order> orders = Order.loadFromFile();
+                    for (Order order : orders) {
+                        if (order.getId() == selectedOrderId && order.getOrderStatus().equals(Order.OrderStatus.PENDING)) {
+                            order.setOrderStatus(Order.OrderStatus.COMPLETED);
+                            order.setCompletedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+                            if (Helper.myUser.notification == null) {
+                                Helper.myUser.notification = new ArrayList<>();
+                            }
+                            Helper.myUser.notification.add(new UserNotification("Order "+order.getId()+" been accepted",order));
+                            List<User> users = User.loadFromFile();
+                            for (User user : users) {
+                                if (user.userName.equals(Helper.myUser.userName)) {
+                                    user.notification = Helper.myUser.notification;
+                                }
+                            }
+                            User customerUser = order.getUser();
+                            for (User user : users) {
+                                if (user.userName.equals(customerUser.userName)) {
+                                    if (user.notification == null) {
+                                        user.notification = new ArrayList<>();
+                                    }
+                                    user.notification.add(new UserNotification("Order " + order.getId() + " has been completed", order));
+                                }
+                            }
+                            User.saveToFile(users);
+                            Order.saveToFile(orders);
+                            updateTable();
+                            return;
+                        }
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error accepting order: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }
