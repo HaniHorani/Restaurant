@@ -53,6 +53,8 @@ public class User implements Serializable {
             System.out.println("File is empty. Returning an empty list.");
             List<User> users = new ArrayList<>();
             users.add(new User("hani", "123", UserType.ADMIN));
+            users.add(new User("bahaa", "123", UserType.ADMIN));
+            users.add(new User("rita", "123", UserType.EMPLOYEE));
             saveToFile(users);
             return users;
         }

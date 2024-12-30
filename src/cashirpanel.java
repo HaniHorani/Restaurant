@@ -127,7 +127,7 @@ public class cashirpanel extends JPanel {
         payType = new JComboBox<>(new String[]{"Cash", "Card"});
         payType.setMaximumSize(new Dimension(200, 30));
 
-        JButton saleButton = new JButton("SALE");
+        JButton saleButton = new JButton("Finish");
         saleButton.addActionListener(e -> completeSale());
         saleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -166,17 +166,29 @@ public class cashirpanel extends JPanel {
         tipField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                calculategrandtotal();
+                try {
+                    calculategrandtotal();
+                }catch (NumberFormatException ex) {
+
+                }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                calculategrandtotal();
+                try {
+                    calculategrandtotal();
+                }catch (NumberFormatException ex) {
+
+                }
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                calculategrandtotal();
+                try {
+                    calculategrandtotal();
+                }catch (NumberFormatException ex) {
+
+                }
             }
         });
         summaryPanel.add(tipField, gbc);
@@ -249,6 +261,10 @@ public class cashirpanel extends JPanel {
             double dgrandTotal= Double.parseDouble(grandTotalLabel.getText());
             long lgrandTotal = (long) dgrandTotal;
             double dtip = Double.parseDouble(tipField.getText());
+            if (dtip<0){
+                JOptionPane.showMessageDialog(this, "Tip can't be negative", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             long ltip = (long) dtip;
             Order myorder=new Order(Helper.myUser, Order.OrderStatus.PENDING,lgrandTotal,ltip,currenttype,currentpay,orderDetails);
             List<Order>myorders=Order.loadFromFile();

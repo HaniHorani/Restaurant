@@ -1,7 +1,10 @@
 package src;
 
-import src.models.Component;
 import src.models.Meal;
+import src.models.Order;
+import src.models.OrderDetail;
+import src.models.Component;
+
 import javax.imageio.IIOException;
 import javax.swing.*;
 import java.awt.*;
@@ -29,14 +32,17 @@ public class mealpanel extends JPanel {
         JScrollPane componentscrollpane = new JScrollPane(componentList);
 
         JButton addMealButton = new JButton("Add meal");
+        JButton editMealButton = new JButton("Edit meal");
+        JButton detailMealButton = new JButton("Show Details");
         JButton deleteMealButton = new JButton("Delete meal");
 
         JButton addcomponentbutton = new JButton("Add component");
         JButton deletecomponentbutton = new JButton("Delete component");
 
-        // Set the maximum size for buttons based on the size of the lists
         Dimension buttonSize = new Dimension(mealList.getPreferredSize().width, 40);
         addMealButton.setPreferredSize(buttonSize);
+        editMealButton.setPreferredSize(buttonSize);
+        detailMealButton.setPreferredSize(buttonSize);
         deleteMealButton.setPreferredSize(buttonSize);
         addcomponentbutton.setPreferredSize(buttonSize);
         deletecomponentbutton.setPreferredSize(buttonSize);
@@ -44,7 +50,22 @@ public class mealpanel extends JPanel {
         addMealButton.addActionListener(e -> {
             String mealName = JOptionPane.showInputDialog(this, "Enter the meal name:");
             if (mealName != null && !mealName.isEmpty()) {
+                for (int i = 0; i < mealName.length(); i++) {
+                    if(!Character.isLetter(mealName.charAt(i))){
+                        JOptionPane.showMessageDialog(this, "Meal name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
                 String priceInput = JOptionPane.showInputDialog(this, "Enter the meal price:");
+                if (priceInput == null || priceInput.isEmpty()) return;
+                if (!priceInput.matches("\\d+")) {
+                    if(Double.parseDouble(priceInput)<0){
+                        JOptionPane.showMessageDialog(this, "Price can't be negative", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    JOptionPane.showMessageDialog(this, "Please enter number only", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 try {
                     double dprice = Double.parseDouble(priceInput);
                     long lprice = (long) dprice;
@@ -52,6 +73,9 @@ public class mealpanel extends JPanel {
                     CheckboxDialog selection = new CheckboxDialog(temp, Component.loadFromFile());
                     selection.setVisible(true);
                     List<String> selectedItems = selection.getSelectedItems();
+                    if (selectedItems.isEmpty()) {
+                        return;
+                    }
                     List<Component> mealComponents = new ArrayList<>();
                     for (String selectedItem : selectedItems) {
                         Component component = new Component(selectedItem);
@@ -78,16 +102,136 @@ public class mealpanel extends JPanel {
             }
         });
 
+        editMealButton.addActionListener(e -> {
+            int selectedIndex = mealList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                String tablename = mealListModel.getElementAt(selectedIndex);
+                String oldname = tablename.split("-")[0].trim();
+                try {
+                    List<Meal> mealList1 = Meal.loadFromFile();
+                    for (Meal meal : mealList1) {
+                        if (meal.name.equals(oldname)){
+                            List<Order> orderList = Order.loadFromFile();
+                            for (Order order : orderList) {
+                                if(order.getOrderStatus() == Order.OrderStatus.PENDING){
+                                    List<OrderDetail> detailList =order.getOrderDetails();
+                                    for (OrderDetail detail : detailList) {
+                                        if (detail.meal.name.equals(meal.name)) {
+                                            JOptionPane.showMessageDialog(this, "Cannot edit meal as it is used in an order.", "Error", JOptionPane.ERROR_MESSAGE);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }catch (IOException | ClassNotFoundException ex){
+                    throw new RuntimeException(ex);
+                }
+                String oldprice = tablename.split("-")[1].trim();
+                oldprice = oldprice.substring(1, oldprice.length());
+                String mealName = JOptionPane.showInputDialog(this, "Enter the meal name:",oldname);
+                if (mealName != null && !mealName.isEmpty()) {
+                    for (int i = 0; i < mealName.length(); i++) {
+                        if(!Character.isLetter(mealName.charAt(i))){
+                            JOptionPane.showMessageDialog(this, "Meal name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                    String priceInput = JOptionPane.showInputDialog(this, "Enter the meal price:",oldprice);
+                    if (priceInput == null || priceInput.isEmpty()) return;
+                    if (!priceInput.matches("\\d+")) {
+                        if(Double.parseDouble(priceInput)<0){
+                            JOptionPane.showMessageDialog(this, "Price can't be negative", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        JOptionPane.showMessageDialog(this, "Please enter number only", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    try {
+                        double dprice = Double.parseDouble(priceInput);
+                        long lprice = (long) dprice;
+                        JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
+                        CheckboxDialog selection = new CheckboxDialog(temp, Component.loadFromFile());
+                        selection.setVisible(true);
+                        List<String> selectedItems = selection.getSelectedItems();
+                        if (selectedItems.isEmpty()) {
+                            return;
+                        }
+                        List<Component> mealComponents = new ArrayList<>();
+                        for (String selectedItem : selectedItems) {
+                            Component component = new Component(selectedItem);
+                            mealComponents.add(component);
+                        }
+                        Meal meal = new Meal(mealName,lprice,mealComponents);
+                        if (Meal.check(meal)) {
+                            List<Meal> mealList1 = Meal.loadFromFile();
+                            mealList1.set(selectedIndex, meal);
+                            Meal.saveToFile(mealList1);
+                            updateAll();
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(this,
+                                    "Meal already exists.",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (NumberFormatException | IIOException | ClassNotFoundException ex) {
+                        JOptionPane.showMessageDialog(this, "Invalid price input. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,"Please select a meal to edit.","Error",JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        detailMealButton.addActionListener(e -> {
+            int selectedIndex = mealList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                try{
+                    String selectedMealName = mealListModel.getElementAt(selectedIndex);
+                    List<Meal> mealList1 = Meal.loadFromFile();
+                    for (Meal meal : mealList1) {
+                        if (meal.name.equals(mealList1.get(selectedIndex).name)) {
+                            String details = meal.name + ": \n";
+                            for (Component component : meal.components) {
+                                details += component.name + "\n";
+                            }
+                            JOptionPane.showMessageDialog(this, details , "Details", JOptionPane.INFORMATION_MESSAGE);
+                            return;
+                        }
+                    }
+                }catch (IOException | ClassNotFoundException exception) {
+                    throw new RuntimeException(exception);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,"Please select a meal to show details.","Error",JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         deleteMealButton.addActionListener(e -> {
             int selectedIndex = mealList.getSelectedIndex();
             if (selectedIndex != -1) {try {
-
                 List<Meal> mealList1 = Meal.loadFromFile();
-                mealListModel.remove(selectedIndex);
                 for (Meal meal : mealList1) {
                     if (meal.name.equals(mealList1.get(selectedIndex).name)) {
+                        List<Order> orderList = Order.loadFromFile();
+                        for (Order order : orderList) {
+                            if(order.getOrderStatus() == Order.OrderStatus.PENDING){
+                                List<OrderDetail> detailList =order.getOrderDetails();
+                                for (OrderDetail detail : detailList) {
+                                    if (detail.meal.name.equals(meal.name)) {
+                                        JOptionPane.showMessageDialog(this, "Cannot delete meal as it is used in an order.", "Error", JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
                         int option = JOptionPane.showConfirmDialog(mealpanel.this, "Are you sure you want to delete" + meal.name+" ?", "Delete", JOptionPane.YES_NO_OPTION);
                         if (option == JOptionPane.YES_OPTION)
+                            mealListModel.remove(selectedIndex);
                             mealList1.remove(meal);
                         break;
                     }
@@ -110,6 +254,12 @@ public class mealpanel extends JPanel {
                 List<Component> componentList1 = Component.loadFromFile();
                 String componentName = JOptionPane.showInputDialog(mealpanel.this, "Enter the component name:");
                 if (componentName != null && !componentName.isEmpty()) {
+                    for (int i = 0; i < componentName.length(); i++) {
+                        if(!componentName.matches("[a-zA-Z]*")){
+                            JOptionPane.showMessageDialog(mealpanel.this, "Component name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
                     Component component = new Component(componentName);
                     if (Component.check(component, componentList1)) {
                         componentList1.add(component);
@@ -157,8 +307,11 @@ public class mealpanel extends JPanel {
         mealLabel.setFont(new Font("Arial", Font.BOLD, 14));
         mealPanel.add(mealLabel);
         mealPanel.add(mealScrollPane);
-        mealPanel.add(deleteMealButton);
         mealPanel.add(addMealButton);
+        mealPanel.add(editMealButton);
+        mealPanel.add(detailMealButton);
+        mealPanel.add(deleteMealButton);
+
 
         JPanel componentpanel = new JPanel();
         componentpanel.setLayout(new BoxLayout(componentpanel, BoxLayout.Y_AXIS));
@@ -166,8 +319,9 @@ public class mealpanel extends JPanel {
         componentlabel.setFont(new Font("Arial", Font.BOLD, 14));
         componentpanel.add(componentlabel);
         componentpanel.add(componentscrollpane);
-        componentpanel.add(deletecomponentbutton);
         componentpanel.add(addcomponentbutton);
+        componentpanel.add(deletecomponentbutton);
+
 
         JPanel listPanel = new JPanel(new GridLayout(1, 2, 10, 10));
         listPanel.add(mealPanel);
@@ -222,10 +376,16 @@ class CheckboxDialog extends JDialog {
         closeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int numSelected = 0;
                 for (JCheckBox box : checkBoxes) {
                     if(box.isSelected()){
                         selectedItems.add(box.getText());
+                        numSelected++;
                     }
+                }
+                if (numSelected == 0) {
+                    JOptionPane.showMessageDialog(CheckboxDialog.this, "Please select at least one item.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
                 dispose();
             }

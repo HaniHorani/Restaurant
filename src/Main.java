@@ -1,19 +1,23 @@
 package src;
 
-import src.models.*;
-import src.models.Component;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.awt.*;
-
 public class Main {
     public static void main(String[] args) {
-       new Login();
+      new Login();
+//       try {
+//           List<User> users = User.loadFromFile();
+//           User deletuser =null;
+//           for (User user : users) {
+//               if(user.userName.equals("omar") && user.password.equals("123")) {
+//                   deletuser = user;
+//               }
+//           }
+//           users.remove(deletuser);
+//           System.out.println("Saved sucessful");
+//           User.saveToFile(users);
+//       }catch (IOException | ClassNotFoundException e) {
+//           throw new RuntimeException(e);
+//       }
+
 //       try {
 //           List<User> users = User.loadFromFile();
 //           for (User user : users) {

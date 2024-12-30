@@ -10,10 +10,10 @@ import javax.swing.border.*;
 import src.models.Order;
 import src.models.User;
 // import src.models.UserNotification;
-
 public class Login extends JFrame implements ActionListener {
 
     Font cocon = new Font("Cocon", Font.PLAIN, 18);
+    ImageIcon tick = new ImageIcon("images\\tick.png");
     JTextField userTextField;
     JPasswordField passField;
     String loginame, loginpassword;
@@ -137,10 +137,10 @@ public class Login extends JFrame implements ActionListener {
             loginame = userTextField.getText();
             loginpassword = new String(passField.getPassword());
             if (loginame.isEmpty()|| loginpassword.isEmpty()) {
-                loginame="bahaa";
-                loginpassword="123";
-//                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
-//                return;
+//                loginame="bahaa";
+//                loginpassword="123";
+                JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
+                return;
             }
             try {
                 List<User> currentUsres;
@@ -149,9 +149,14 @@ public class Login extends JFrame implements ActionListener {
                     if (u.userName.equals(loginame) && u.password.equals(loginpassword)) {
                         System.out.println("==================================");
                         Helper.myUser = u;
+                        JOptionPane.showMessageDialog(null,"Login sucessful","Login",JOptionPane.INFORMATION_MESSAGE,tick);
                         this.dispose();
                         new Home();
                         break;
+                    }
+                    if (u.userName.equals(loginame) && !u.password.equals(loginpassword)) {
+                        JOptionPane.showMessageDialog(null, "Wrong password", "Falied", JOptionPane.WARNING_MESSAGE);
+                        return;
                     }
                 }
                 if (Helper.myUser.userName == null ) {
@@ -204,6 +209,7 @@ class Resizer extends JPanel {
 class Register extends JPanel implements ActionListener {
 
     Font cocon = new Font("Cocon", Font.PLAIN, 18);
+    ImageIcon tick = new ImageIcon("images\\tick.png");
     JButton acceptButton;
     String newusername;
     String newpassword;
@@ -314,37 +320,39 @@ class Register extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // while (true) {
             if (!(newpassword.equals(confirmpassword))) {
                 JOptionPane.showMessageDialog(null, "Password mismatch", "Falied", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            User newuser = new User();
-            newuser.userName = newusername;
-            newuser.password = newpassword;
-            newuser.type = User.UserType.CUSTOMER;
+            if((newusername.charAt(0)>='A' && newusername.charAt(0)<='Z') ||(newusername.charAt(0)>='a' && newusername.charAt(0)<='z')) {
+                User newuser = new User();
+                newuser.userName = newusername;
+                newuser.password = newpassword;
+                newuser.type = User.UserType.CUSTOMER;
 
-            try {
-                List<User> currentusers = User.loadFromFile();
-                if (User.check(newuser)) {
-                    currentusers.add(newuser);
-                } else {
-                    JOptionPane.showMessageDialog(null, "The User is already exsit", "Falied",
-                            JOptionPane.WARNING_MESSAGE);
-                    return;
+                try {
+                    List<User> currentusers = User.loadFromFile();
+                    if (User.check(newuser)) {
+                        currentusers.add(newuser);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "The User is already exsit", "Falied",
+                                JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    User.saveToFile(currentusers);
+                    JOptionPane.showMessageDialog(null, "Rigster sucessful", "Rigster", JOptionPane.INFORMATION_MESSAGE, tick);
+                    JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
+                    temp.dispose();
+                    //Helper.myUser = newuser;
+                    new Login();
+                } catch (IOException | ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
                 }
-                User.saveToFile(currentusers);
-
-                JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
-                temp.dispose();
-                Helper.myUser = newuser;
-                new Home();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
             }
-
+            else {
+                JOptionPane.showMessageDialog(null, "The User name must start with a letter", "Falied", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
         }
     }
 }

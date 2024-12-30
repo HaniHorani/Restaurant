@@ -5,11 +5,9 @@ import src.models.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class manegementpanel extends JPanel {
@@ -51,7 +49,20 @@ public class manegementpanel extends JPanel {
 
             this.add(buttonPanel, BorderLayout.SOUTH);
 
-            updateTable();
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        updateTable();
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }
+            });
+            thread.setDaemon(true);
+            thread.start();
         }
         private void updateTable() {
             try{

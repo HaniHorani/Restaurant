@@ -42,7 +42,6 @@ public class notificationpanel extends JPanel {
     private class myrunnable implements Runnable{
         @Override
         public void run() {
-            JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(notificationpanel.this);
             while (true) {
                 update();
                 try {
