@@ -8,16 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
+
 import src.models.Order;
 import src.models.User;
-// import src.models.UserNotification;
-public class Login extends JFrame implements ActionListener {
+public class Login extends JFrame implements ActionListener{
 
-    Font cocon = new Font("Cocon", Font.PLAIN, 18);
-    ImageIcon tick = new ImageIcon("images\\tick.png");
+    Font cocon = new Font("Cocon",Font.PLAIN, 18);
+    ImageIcon tick =new ImageIcon("images\\tick.png");
     JTextField userTextField;
     JPasswordField passField;
-    String loginame, loginpassword;
+    String loginame,loginpassword;
     JButton loginButton;
     JButton SginButton;
     JPanel mainPanel;
@@ -31,7 +31,7 @@ public class Login extends JFrame implements ActionListener {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = screenSize.width;
         int screenHeight = screenSize.height;
-        this.setLocation((screenWidth - this.getWidth()) / 2, (screenHeight - this.getHeight()) / 2);
+        this.setLocation((screenWidth-this.getWidth())/2,(screenHeight-this.getHeight())/2);
 
         mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -51,42 +51,36 @@ public class Login extends JFrame implements ActionListener {
 
         JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(cocon);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        mainPanel.add(userLabel, gbc);
+        gbc.gridx =0;
+        gbc.gridy =1;
+        gbc.gridwidth =1;
+        gbc.anchor =GridBagConstraints.EAST;
+        mainPanel.add(userLabel,gbc);
 
-        userTextField = new JTextField();
+        userTextField =new JTextField();
         userTextField.setFont(cocon);
-        userTextField.setPreferredSize(new Dimension(300, 40));
-        userTextField.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(Color.BLACK, 1),
-                new EmptyBorder(10, 10, 10, 10)
-        ));
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        mainPanel.add(userTextField, gbc);
+        userTextField.setPreferredSize(new Dimension(300,40));
+        userTextField.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK, 1),new EmptyBorder(10, 10, 10, 10)));
+        gbc.gridx =1;
+        gbc.gridy =1;
+        gbc.anchor =GridBagConstraints.WEST;
+        mainPanel.add(userTextField,gbc);
 
-        JLabel passLabel = new JLabel("Password:");
+        JLabel passLabel =new JLabel("Password:");
         passLabel.setFont(cocon);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
-        mainPanel.add(passLabel, gbc);
+        gbc.gridx =0;
+        gbc.gridy =2;
+        gbc.anchor =GridBagConstraints.EAST;
+        mainPanel.add(passLabel,gbc);
 
-        passField = new JPasswordField();
+        passField =new JPasswordField();
         passField.setFont(cocon);
-        passField.setPreferredSize(new Dimension(300, 40));
-        passField.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(Color.BLACK, 1),
-                new EmptyBorder(10, 10, 10, 10)
-        ));
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        mainPanel.add(passField, gbc);
+        passField.setPreferredSize(new Dimension(300,40));
+        passField.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK, 1), new EmptyBorder(10,10,10,10)));
+        gbc.gridx =1;
+        gbc.gridy =2;
+        gbc.anchor =GridBagConstraints.WEST;
+        mainPanel.add(passField,gbc);
 
         loginButton = new JButton("Login");
         loginButton.addActionListener(this);
@@ -94,12 +88,12 @@ public class Login extends JFrame implements ActionListener {
         loginButton.setForeground(Color.WHITE);
         loginButton.setBackground(new Color(64, 123, 255));
         loginButton.setPreferredSize(new Dimension(150, 40));
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridx =0;
+        gbc.gridy =3;
+        gbc.gridwidth =2;
         gbc.anchor = GridBagConstraints.CENTER;
         loginButton.setFocusable(false);
-        mainPanel.add(loginButton, gbc);
+        mainPanel.add(loginButton,gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -113,7 +107,7 @@ public class Login extends JFrame implements ActionListener {
         SginButton.setFocusable(false);
         SginButton.addActionListener(this);
 
-        mainPanel.add(SginButton, gbc);
+        mainPanel.add(SginButton,gbc);
 
         mainPanel.setBackground(Color.white);
 
@@ -125,9 +119,9 @@ public class Login extends JFrame implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e){
 
-        if (e.getSource() == SginButton) {
+        if (e.getSource() == SginButton){
             this.remove(mainPanel);
             mainPanel = new Register();
             this.repaint();
@@ -135,25 +129,18 @@ public class Login extends JFrame implements ActionListener {
             this.revalidate();
             this.setTitle("Sgin up");
 
-        } else if (e.getSource() == loginButton) {
+        } else if (e.getSource() == loginButton){
             loginame = userTextField.getText();
             loginpassword = new String(passField.getPassword());
-            if(loginame.isEmpty()&&loginpassword.isEmpty() ) {
-                loginame = "hani";
-                loginpassword = "123";
-            }
-            if (loginame.isEmpty()|| loginpassword.isEmpty()) {
-//                loginame="bahaa";
-//                loginpassword="123";
+            if (loginame.isEmpty()|| loginpassword.isEmpty()){
                 JOptionPane.showMessageDialog(null, "The user name or password is empty", "Falied", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             try {
-
                 List<User> currentUsres;
                 currentUsres = User.loadFromFile();
-                for (User u : currentUsres) {
-                    if (u.userName.equals(loginame) && u.password.equals(loginpassword)) {
+                for (User u : currentUsres){
+                    if (u.userName.equals(loginame) && u.password.equals(loginpassword)){
                         System.out.println("==================================");
                         Helper.myUser = u;
                         JOptionPane.showMessageDialog(null,"Login sucessful","Login",JOptionPane.INFORMATION_MESSAGE,tick);
@@ -161,72 +148,65 @@ public class Login extends JFrame implements ActionListener {
                         new Home();
                         break;
                     }
-                    if (u.userName.equals(loginame) && !u.password.equals(loginpassword)) {
-                        JOptionPane.showMessageDialog(null, "Wrong password", "Falied", JOptionPane.WARNING_MESSAGE);
+                    if (u.userName.equals(loginame) && !u.password.equals(loginpassword)){
+                        JOptionPane.showMessageDialog(null,"Wrong password","Falied", JOptionPane.WARNING_MESSAGE);
                         return;
                     }
                 }
-                if (Helper.myUser.userName == null ) {
-                    JOptionPane.showMessageDialog(null, "User not found", "Falied", JOptionPane.WARNING_MESSAGE);
+                if (Helper.myUser.userName == null ){
+                    JOptionPane.showMessageDialog(null,"User not found","Falied", JOptionPane.WARNING_MESSAGE);
                 }
 
-            } catch (IOException | ClassNotFoundException ex) {
+            } catch (IOException | ClassNotFoundException ex){
                 throw new RuntimeException(ex);
             }
-                try {
-                   HashMap <String,Integer>  countDailyOrdersReport=  Helper.Reports.countDailyOrdersReport();
-                    System.out.println("=========================="+countDailyOrdersReport.values().stream().max(Integer::compareTo).get());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                }
             }
         }
 
 }
 
-class Resizer extends JPanel {
+class Resizer extends JPanel{
 
     private Image image;
 
-    public Resizer(String path) {
+    public Resizer(String path){
         image = new ImageIcon(path).getImage();
-        if (image == null) {
+        if (image == null){
             System.out.println("Failed to load image.");
         }
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g){
         super.paintComponent(g);
         if (image != null) {
-            int panelWidth = getWidth();
-            int panelHeight = getHeight();
+            int panelWidth =getWidth();
+            int panelHeight =getHeight();
 
-            int imgWidth = image.getWidth(null);
-            int imgHeight = image.getHeight(null);
+            int imgWidth =image.getWidth(null);
+            int imgHeight =image.getHeight(null);
 
-            double scaleX = (double) panelWidth / imgWidth;
-            double scaleY = (double) panelHeight / imgHeight;
+            double scaleX = (double) panelWidth/imgWidth;
+            double scaleY = (double) panelHeight/imgHeight;
             double scale = Math.min(scaleX, scaleY);
 
-            int newWidth = (int) (imgWidth * scale);
-            int newHeight = (int) (imgHeight * scale);
+            int newWidth = (int) (imgWidth*scale);
+            int newHeight = (int) (imgHeight*scale);
 
-            int x = (panelWidth - newWidth) / 2;
-            int y = (panelHeight - newHeight) / 2;
+            int x = (panelWidth-newWidth)/2;
+            int y = (panelHeight-newHeight)/2;
 
-            g.drawImage(image, x, y, newWidth, newHeight, this);
+            g.drawImage(image,x,y,newWidth,newHeight,this);
         }
     }
 }
 
-class Register extends JPanel implements ActionListener {
+class Register extends JPanel implements ActionListener{
 
     Font cocon = new Font("Cocon", Font.PLAIN, 18);
     ImageIcon tick = new ImageIcon("images\\tick.png");
     JButton acceptButton;
+    JButton cancelButton;
     String newusername;
     String newpassword;
     String confirmpassword;
@@ -289,14 +269,14 @@ class Register extends JPanel implements ActionListener {
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
-        this.add(newpassField, gbc);
+        this.add(newpassField,gbc);
 
         JLabel confirmPassLabel = new JLabel("Confirm Password:");
         confirmPassLabel.setFont(cocon);
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
-        this.add(confirmPassLabel, gbc);
+        this.add(confirmPassLabel,gbc);
 
         confirmPassField = new JPasswordField();
         confirmPassField.setFont(cocon);
@@ -322,6 +302,20 @@ class Register extends JPanel implements ActionListener {
         gbc.anchor = GridBagConstraints.CENTER;
         acceptButton.setFocusable(false);
         this.add(acceptButton, gbc);
+
+        cancelButton = new JButton("I already have an account");
+        cancelButton.setFont(cocon);
+        cancelButton.setForeground(new Color(64, 123, 255));
+        cancelButton.setBackground(Color.WHITE);
+        cancelButton.setBorder(null);
+        cancelButton.setPreferredSize(new Dimension(150, 40));
+        cancelButton.addActionListener(this);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        cancelButton.setFocusable(false);
+        this.add(cancelButton, gbc);
 
         this.setBackground(Color.white);
     }
@@ -369,6 +363,11 @@ class Register extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(null, "The User name must start with a letter", "Falied", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+        }
+        if(e.getSource() == cancelButton) {
+            JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
+            temp.dispose();
+            new Login();
         }
     }
 }

@@ -69,27 +69,33 @@ public class manegementpanel extends JPanel {
         thread.start();
     }
     private void updateTable() {
-        try{
-            tableModel.setRowCount(0);
-            if(Helper.myUser.type == User.UserType.CUSTOMER){
-            List<Order> orders = Order.loadFromFile();
-            for (Order order : orders) {
-                if (Helper.myUser.userName.equals(order.getUser().userName)) {
-                    tableModel.addRow(new Object[]{order.getId(), order.getUser().userName,order.getOrderStatus(),order.getCreatedAt(),order.getCompletedAt(),order.getTips(),order.getTotalPrice()});
-                }
-            }
-            }
-            else {
-                List<Order> orders = Order.loadFromFile();
-                for (Order order : orders) {
-                        tableModel.addRow(new Object[]{order.getId(), order.getUser().userName,order.getOrderStatus(),order.getCreatedAt(),order.getCompletedAt(),order.getTips(),order.getTotalPrice()});
-                }
-            }
-        }catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getClass().getName() + " - " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        try {
+            tableModel.setRowCount(0); // تفريغ الجدول
 
+            List<Order> orders = Order.loadFromFile();
+
+            if (Helper.myUser.type == User.UserType.CUSTOMER) {
+                for (int i = orders.size() - 1; i >= 0; i--) {
+                    Order order = orders.get(i);
+                    if (Helper.myUser.userName.equals(order.getUser().userName)) {
+                        tableModel.addRow(new Object[]{order.getId(),order.getUser().userName,order.getOrderStatus(),order.getCreatedAt(),order.getCompletedAt()  != null ? order.getCompletedAt() : "N/A",order.getTips()!= 0 ? order.getTips() : "N/A", order.getTotalPrice()});
+                    }
+                }
+            } else {
+                for (int i = orders.size() - 1; i >= 0; i--) {
+                    Order order = orders.get(i);
+                    tableModel.addRow(new Object[]{order.getId(),order.getUser().userName,order.getOrderStatus(),order.getCreatedAt(),order.getCompletedAt()  != null ? order.getCompletedAt() : "N/A",order.getTips()!= 0 ? order.getTips() : "N/A", order.getTotalPrice()});
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error: " + e.getClass().getName() + " - " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
+
     private void details() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
