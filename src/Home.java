@@ -31,11 +31,12 @@ public class Home extends JFrame  {
         this.setTitle("Resturant");
         this.setIconImage(new ImageIcon("images\\Resturant-main.png").getImage());
         this.setSize(800, 600);
+        this.setMinimumSize(new Dimension(800,600));
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         orederspanel = new JPanel();
-        reportspanel = new JPanel();
+        reportspanel = new reprotpanel();
 
         usersButton.setVisible(false);
         reportButton.setVisible(false);
@@ -98,6 +99,16 @@ public class Home extends JFrame  {
                 panel1.repaint();
                 toplabel.setText("Users");
                 center.add(userspanel);
+                panel1.revalidate();
+            }
+        });
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                center.removeAll();
+                panel1.repaint();
+                toplabel.setText("Report");
+                center.add(reportspanel);
                 panel1.revalidate();
             }
         });

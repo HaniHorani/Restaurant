@@ -37,7 +37,16 @@ public class mealpanel extends JPanel {
         JButton deleteMealButton = new JButton("Delete meal");
 
         JButton addcomponentbutton = new JButton("Add component");
+        JButton editcomponentbutton = new JButton("Edit component");
         JButton deletecomponentbutton = new JButton("Delete component");
+
+        addMealButton.setFocusable(false);
+        editMealButton.setFocusable(false);
+        detailMealButton.setFocusable(false);
+        deleteMealButton.setFocusable(false);
+        addcomponentbutton.setFocusable(false);
+        editcomponentbutton.setFocusable(false);
+        deletecomponentbutton.setFocusable(false);
 
         Dimension buttonSize = new Dimension(mealList.getPreferredSize().width, 40);
         addMealButton.setPreferredSize(buttonSize);
@@ -45,13 +54,14 @@ public class mealpanel extends JPanel {
         detailMealButton.setPreferredSize(buttonSize);
         deleteMealButton.setPreferredSize(buttonSize);
         addcomponentbutton.setPreferredSize(buttonSize);
+        editcomponentbutton.setPreferredSize(buttonSize);
         deletecomponentbutton.setPreferredSize(buttonSize);
 
         addMealButton.addActionListener(e -> {
             String mealName = JOptionPane.showInputDialog(this, "Enter the meal name:");
             if (mealName != null && !mealName.isEmpty()) {
                 for (int i = 0; i < mealName.length(); i++) {
-                    if(!Character.isLetter(mealName.charAt(i))){
+                    if(!Character.isLetter(mealName.charAt(i)) && !Character.isWhitespace(mealName.charAt(i))){
                         JOptionPane.showMessageDialog(this, "Meal name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
@@ -134,7 +144,7 @@ public class mealpanel extends JPanel {
                 String mealName = JOptionPane.showInputDialog(this, "Enter the meal name:",oldname);
                 if (mealName != null && !mealName.isEmpty()) {
                     for (int i = 0; i < mealName.length(); i++) {
-                        if(!Character.isLetter(mealName.charAt(i))){
+                        if(!Character.isLetter(mealName.charAt(i)) && !Character.isWhitespace(mealName.charAt(i))){
                             JOptionPane.showMessageDialog(this, "Meal name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -152,8 +162,15 @@ public class mealpanel extends JPanel {
                     try {
                         double dprice = Double.parseDouble(priceInput);
                         long lprice = (long) dprice;
+                        Meal nowmeal = new Meal();
+                        for(Meal m:Meal.loadFromFile()){
+                            if (m.name.equals(mealName)){
+                                nowmeal = m;
+                                break;
+                            }
+                        }
                         JFrame temp = (JFrame) SwingUtilities.getWindowAncestor(this);
-                        CheckboxDialog selection = new CheckboxDialog(temp, Component.loadFromFile());
+                        CheckboxDialog selection = new CheckboxDialog(temp, Component.loadFromFile(),nowmeal.components);
                         selection.setVisible(true);
                         List<String> selectedItems = selection.getSelectedItems();
                         if (selectedItems.isEmpty()) {
@@ -190,7 +207,6 @@ public class mealpanel extends JPanel {
                 JOptionPane.showMessageDialog(this,"Please select a meal to edit.","Error",JOptionPane.ERROR_MESSAGE);
             }
         });
-
         detailMealButton.addActionListener(e -> {
             int selectedIndex = mealList.getSelectedIndex();
             if (selectedIndex != -1) {
@@ -259,7 +275,7 @@ public class mealpanel extends JPanel {
                 String componentName = JOptionPane.showInputDialog(mealpanel.this, "Enter the component name:");
                 if (componentName != null && !componentName.isEmpty()) {
                     for (int i = 0; i < componentName.length(); i++) {
-                        if(!componentName.matches("[a-zA-Z]*")){
+                        if(!Character.isLetter(componentName.charAt(i)) && !Character.isWhitespace(componentName.charAt(i))){
                             JOptionPane.showMessageDialog(mealpanel.this, "Component name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -284,6 +300,41 @@ public class mealpanel extends JPanel {
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(this, "Error: " + exception.getClass().getName() + " - " + exception.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+        });
+
+        editcomponentbutton.addActionListener(e ->{  try {
+            List<Component> componentList1 = Component.loadFromFile();
+            int selectedIndex = componentList.getSelectedIndex();
+            if (selectedIndex != -1) {
+               Component cur= componentList1.get(selectedIndex);
+                String componentName = JOptionPane.showInputDialog(mealpanel.this, "Enter the component name:",cur.name);
+                if (componentName != null && !componentName.isEmpty()) {
+                    for (int i = 0; i < componentName.length(); i++) {
+                        if(!Character.isLetter(componentName.charAt(i)) && !Character.isWhitespace(componentName.charAt(i))){
+                            JOptionPane.showMessageDialog(this, "Component name can only contain letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                    cur.name = componentName;
+                    Component.saveToFile(componentList1);
+                    updateAll();
+                } else {
+                    JOptionPane.showMessageDialog(mealpanel.this,
+                            "Please enter a component name.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                Component.saveToFile(componentList1);
+                updateAll();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Please select a component to delete.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(this, "Error: " + exception.getClass().getName() + " - " + exception.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         });
 
         deletecomponentbutton.addActionListener(e -> {
@@ -324,6 +375,7 @@ public class mealpanel extends JPanel {
         componentpanel.add(componentlabel);
         componentpanel.add(componentscrollpane);
         componentpanel.add(addcomponentbutton);
+        componentpanel.add(editcomponentbutton);
         componentpanel.add(deletecomponentbutton);
 
 
@@ -360,7 +412,7 @@ class CheckboxDialog extends JDialog {
         return selectedItems;
     }
 
-    public CheckboxDialog(JFrame parentFrame, List<Component> items) {
+    public CheckboxDialog(JFrame parentFrame, List<Component> items ) {
         super(parentFrame, "Select Items", true);
         setLayout(new BorderLayout());
 
@@ -401,5 +453,58 @@ class CheckboxDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
     }
+
+    public CheckboxDialog(JFrame parentFrame, List<Component> items, List<Component> originalComponents) {
+        super(parentFrame, "Select Items", true);
+        setLayout(new BorderLayout());
+
+        checkBoxes = new JCheckBox[items.size()];
+        JPanel checkBoxPanel = new JPanel();
+        checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
+
+        for (Component item : items) {
+            JCheckBox checkBox = new JCheckBox(item.name);
+
+            for (Component originalItem : originalComponents) {
+                if (item.name.equals(originalItem.name)) {
+                    checkBox.setSelected(true);
+                    break;
+                }
+            }
+
+            checkBoxes[items.indexOf(item)] = checkBox;
+            checkBoxPanel.add(checkBox);
+        }
+
+
+        JScrollPane scrollPane = new JScrollPane(checkBoxPanel);
+        scrollPane.setPreferredSize(new Dimension(300, 200));
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int numSelected = 0;
+                for (JCheckBox box : checkBoxes) {
+                    if (box.isSelected()) {
+                        selectedItems.add(box.getText());
+                        numSelected++;
+                    }
+                }
+                if (numSelected == 0) {
+                    JOptionPane.showMessageDialog(CheckboxDialog.this, "Please select at least one item.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                dispose();
+            }
+        });
+
+        add(scrollPane, BorderLayout.CENTER);
+        add(closeButton, BorderLayout.SOUTH);
+        setSize(350, 300);
+        setLocationRelativeTo(parentFrame);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    }
+
 }
 

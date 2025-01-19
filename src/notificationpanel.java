@@ -47,7 +47,7 @@ public class notificationpanel extends JPanel {
     private class myrunnable implements Runnable{
         @Override
         public void run() {
-            while (true) {
+            while (!Helper.myUser.equals(null)) {
                 update();
                 try {
                     Thread.sleep(3000);
