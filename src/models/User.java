@@ -29,6 +29,18 @@ public class User implements Serializable {
         this.userName = userName;
         this.password = password;
         this.type = type;
+
+        List<User> users = null;
+        try {
+            users = loadFromFile(); if (users.isEmpty()) {
+                this.id = 1;
+            } else {
+                this.id = users.get(users.size() - 1).id + 1;
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public static Boolean check(User newUser) throws ClassNotFoundException, IOException {

@@ -107,6 +107,7 @@ public class mealpanel extends JPanel {
             if (selectedIndex != -1) {
                 String tablename = mealListModel.getElementAt(selectedIndex);
                 String oldname = tablename.split("-")[0].trim();
+                //chech the male is pending in order list
                 try {
                     List<Meal> mealList1 = Meal.loadFromFile();
                     for (Meal meal : mealList1) {
@@ -164,18 +165,21 @@ public class mealpanel extends JPanel {
                             mealComponents.add(component);
                         }
                         Meal meal = new Meal(mealName,lprice,mealComponents);
-                        if (Meal.check(meal)) {
-                            List<Meal> mealList1 = Meal.loadFromFile();
-                            mealList1.set(selectedIndex, meal);
-                            Meal.saveToFile(mealList1);
-                            updateAll();
-                        }
-                        else {
+                        System.out.println("the old name:"+ oldname+"\n the new name :"+ mealName+"\ncheke:"+Meal.check(meal));
+                        if(!oldname.equals(mealName)&&!Meal.check(meal)){
                             JOptionPane.showMessageDialog(this,
                                     "Meal already exists.",
                                     "Error",
                                     JOptionPane.ERROR_MESSAGE);
+                            return;
                         }
+
+                            List<Meal> mealList1 = Meal.loadFromFile();
+                            mealList1.set(selectedIndex, meal);
+                            Meal.saveToFile(mealList1);
+                            updateAll();
+
+
                     } catch (NumberFormatException | IIOException | ClassNotFoundException ex) {
                         JOptionPane.showMessageDialog(this, "Invalid price input. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
                     } catch (IOException ex) {

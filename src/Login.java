@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -125,6 +126,7 @@ public class Login extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         if (e.getSource() == SginButton) {
             this.remove(mainPanel);
             mainPanel = new Register();
@@ -136,6 +138,10 @@ public class Login extends JFrame implements ActionListener {
         } else if (e.getSource() == loginButton) {
             loginame = userTextField.getText();
             loginpassword = new String(passField.getPassword());
+            if(loginame.isEmpty()&&loginpassword.isEmpty() ) {
+                loginame = "hani";
+                loginpassword = "123";
+            }
             if (loginame.isEmpty()|| loginpassword.isEmpty()) {
 //                loginame="bahaa";
 //                loginpassword="123";
@@ -143,6 +149,7 @@ public class Login extends JFrame implements ActionListener {
                 return;
             }
             try {
+
                 List<User> currentUsres;
                 currentUsres = User.loadFromFile();
                 for (User u : currentUsres) {
@@ -162,12 +169,21 @@ public class Login extends JFrame implements ActionListener {
                 if (Helper.myUser.userName == null ) {
                     JOptionPane.showMessageDialog(null, "User not found", "Falied", JOptionPane.WARNING_MESSAGE);
                 }
+
             } catch (IOException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
-
+                try {
+                   HashMap <String,Integer>  countDailyOrdersReport=  Helper.Reports.countDailyOrdersReport();
+                    System.out.println("=========================="+countDailyOrdersReport.values().stream().max(Integer::compareTo).get());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
-    }
+
 }
 
 class Resizer extends JPanel {

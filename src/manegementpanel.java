@@ -17,7 +17,7 @@ public class manegementpanel extends JPanel {
 
         public manegementpanel() {
             this.setLayout(new BorderLayout());
-            String[] columnNames = {"Order ID", "Customer Name", "Status","Created At"};
+            String[] columnNames = {"Order ID", "Customer Name", "Status","Created At","Completed At","Tips","Total Price"};
             tableModel = new DefaultTableModel(columnNames, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
@@ -69,7 +69,7 @@ public class manegementpanel extends JPanel {
                 tableModel.setRowCount(0);
                 List<Order> orders = Order.loadFromFile();
                 for (Order order : orders) {
-                       tableModel.addRow(new Object[]{order.getId(), order.getUser().userName,order.getOrderStatus(),order.getCreatedAt()});
+                       tableModel.addRow(new Object[]{order.getId(), order.getUser().userName,order.getOrderStatus(),order.getCreatedAt(),order.getCompletedAt(),order.getTips(),order.getTotalPrice()});
                 }
             }catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Error: " + e.getClass().getName() + " - " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

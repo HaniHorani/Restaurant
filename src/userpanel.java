@@ -1,5 +1,6 @@
 package src;
 
+import src.models.Meal;
 import src.models.Order;
 import src.manegementpanel;
 import src.models.OrderDetail;
@@ -114,6 +115,13 @@ public class userpanel extends JPanel {
             for (User user : users) {
                 if (user.userName.equals(selectedUserName)) {
                     String newUserName = JOptionPane.showInputDialog(this, "Enter New User Name:", user.userName);
+                    if(!user.userName.equals(newUserName)&&!User.check(new User(newUserName,"", User.UserType.EMPLOYEE))){
+                        JOptionPane.showMessageDialog(this,
+                                "User already exists.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     if (newUserName != null && !newUserName.trim().isEmpty()) user.userName = newUserName;
 
                     String newPassword = JOptionPane.showInputDialog(this, "Enter New Password:", user.password);
