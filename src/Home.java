@@ -20,10 +20,12 @@ public class Home extends JFrame  {
     private JLabel toplabel;
     private JButton notificationbutton;
     private JButton mealsButton;
+    private JButton reportButton;
     private JPanel mealspanel;
     private JPanel orederspanel;
     private JPanel userspanel;
     private JPanel notificationpanel;
+    private JPanel reportspanel;
 
     public Home() {
         this.setTitle("Resturant");
@@ -33,15 +35,19 @@ public class Home extends JFrame  {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         orederspanel = new JPanel();
+        reportspanel = new JPanel();
 
         usersButton.setVisible(false);
+        reportButton.setVisible(false);
         if (Helper.myUser.type == User.UserType.ADMIN) {
             usersButton.setVisible(true);
+            reportButton.setVisible(true);
         }
         if(Helper.myUser.type == User.UserType.CUSTOMER){
-            mealsButton.setVisible(false);
+          //  mealsButton.setVisible(false);
             orderButton.setText("Add Order");
             orederspanel = new cashirpanel();
+            mealspanel = new manegementpanel();
         }
         else{
             mealspanel=new mealpanel();
