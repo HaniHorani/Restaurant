@@ -5,10 +5,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import src.models.Meal;
@@ -25,9 +22,9 @@ public class Helper implements Serializable{
         daliyUser
     }
     public  class  Reports{
-        public static HashMap<String, Integer> countDailyOrdersReport() throws IOException, ClassNotFoundException{
+        public static TreeMap<String, Integer> countDailyOrdersReport() throws IOException, ClassNotFoundException{
             List<Order> orders = Order.loadFromFile();
-            HashMap<String, Integer> dailyOrderCount = new HashMap<>();
+            TreeMap<String, Integer> dailyOrderCount = new TreeMap<>();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             for (Order order : orders){
                 String date = LocalDate.parse(order.getCreatedAt().split(" ")[0], DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString();
@@ -35,14 +32,14 @@ public class Helper implements Serializable{
             }
             return dailyOrderCount;
         }
-        public static HashMap<String,Long> dailyRevenueReport() throws IOException, ClassNotFoundException{
+        public static TreeMap<String,Long> dailyRevenueReport() throws IOException, ClassNotFoundException{
             List<Order> orders = Order.loadFromFile();
-            HashMap<String, Long> dailyRevenue = new HashMap<>();
+            TreeMap<String, Long> dailyRevenue = new TreeMap<>(); // TreeMap لترتيب المفاتيح تلقائيًا
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             for (Order order : orders) {
-                String date = LocalDate.parse(order.getCreatedAt().split(" ")[0],DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString();
-                long orderRevenue = order.getTotalPrice() + order.getTips();
-                dailyRevenue.put(date, dailyRevenue.getOrDefault(date,0L) + orderRevenue);
+                String date = LocalDate.parse(order.getCreatedAt().split(" ")[0],
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString();
+                dailyRevenue.put(date, dailyRevenue.getOrDefault(date, 0L) + order.getTotalPrice());
             }
             return dailyRevenue;
         }

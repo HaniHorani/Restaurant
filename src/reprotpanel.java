@@ -10,10 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class reprotpanel extends JPanel {
     private JPanel center;
@@ -110,13 +108,13 @@ public class reprotpanel extends JPanel {
 
 }
 class dailyorderpanel extends JPanel {
-    private HashMap<String,Integer> dailyordermap;
+    private TreeMap<String,Integer> dailyordermap;
     private JTable table;
     private DefaultTableModel tableModel;
 
     public dailyorderpanel() {
 
-        String[] columnNames = {"Order", "Count"};
+        String[] columnNames = {"Day", "Count"};
 
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -224,13 +222,13 @@ class topmealpanel extends JPanel {
     }
 }
 class dailyfunds extends JPanel {
-    private HashMap<String, Long> dailyfundsmap;
+    private TreeMap<String, Long> dailyfundsmap;
     private JTable table;
     private DefaultTableModel tableModel;
 
     public dailyfunds() {
 
-        String[] columnNames = {"Day", "Fund"};
+        String[] columnNames = {"Day", "Total Price"};
 
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override

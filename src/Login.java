@@ -146,6 +146,9 @@ public class Login extends JFrame implements ActionListener{
                         JOptionPane.showMessageDialog(null,"Login sucessful","Login",JOptionPane.INFORMATION_MESSAGE,tick);
                         this.dispose();
                         new Home();
+                        if ( Helper.myUser.type == User.UserType.CUSTOMER && Helper.myUser.notification!=null && Helper.myUser.notification.get( Helper.myUser.notification.size()-1).message.contains("completed")){
+                        JOptionPane.showMessageDialog(null,Helper.myUser.notification.get( Helper.myUser.notification.size()-1).message,"Notification", JOptionPane.INFORMATION_MESSAGE);
+                        }
                         break;
                     }
                     if (u.userName.equals(loginame) && !u.password.equals(loginpassword)){
